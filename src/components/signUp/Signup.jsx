@@ -1,15 +1,25 @@
-import React from "react";
-import Paper from "@material-ui/core/Paper";
+import React, { useState } from "react";
 import Grid from "@material-ui/core/Grid";
+import Axios from "axios";
 import { TextField, Avatar, Button } from "@material-ui/core";
 
 function SignUp() {
+  const [pseudo, setPseudo] = useState("");
+  const [logo, setLogo] = useState("");
+  const [isLoading, setisLoading] = useState(false);
+
+  const getRandomAvatar = () => {
+    Axios.get(`https://randomuser.me/api`).then((res) =>
+      setLogo(res.data.results[0].picture.large)
+    );
+  };
+
   return (
     <>
       <Grid container>
         <Grid item xs={12} style={{ marginTop: "200px" }}>
           <Grid container justify="center">
-            <input
+            {/* <input
               accept="image/*"
               style={{ display: "none" }}
               id="contained-button-file"
@@ -27,12 +37,12 @@ function SignUp() {
               >
                 Upload
               </Button>
-            </label>
+            </label> */}
 
             <Button
               color="primary"
               variant="outlined"
-              // onClick={getAvatar}
+              onClick={getRandomAvatar}
               // startIcon={<PersonIcon />}
             >
               Random
@@ -43,6 +53,7 @@ function SignUp() {
           <Grid container alignItems="center" justify="center">
             <Avatar
               alt="Temy Sharp"
+              src={logo}
               style={{ width: "70px", height: "70px" }}
             />
           </Grid>
