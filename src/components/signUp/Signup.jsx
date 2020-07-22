@@ -2,6 +2,11 @@ import React, { useState } from "react";
 import Grid from "@material-ui/core/Grid";
 import Axios from "axios";
 import { TextField, Avatar, Button } from "@material-ui/core";
+import PersonIcon from "@material-ui/icons/Person";
+import { Redirect } from "react-router-dom";
+
+
+import { apiUrl } from "../../apiUrl";
 
 function SignUp() {
   const [pseudo, setPseudo] = useState("");
@@ -13,6 +18,25 @@ function SignUp() {
       setLogo(res.data.results[0].picture.large)
     );
   };
+
+  const Signup = async (e) => {
+    e.preventDefault();
+    try {
+      if (logo && pseudo) {
+        const res = await Axios.post(`${apiUrl}/users`, {
+          pseudo,
+          avatar: logo,
+        });
+        window.localStorage.setItem("uuid", res.data.uuid);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  if (window.localStorage.getItem("uuid")) {
+    return <Redirect to="/home" />;
+  }
 
   return (
     <>
@@ -43,7 +67,7 @@ function SignUp() {
               color="primary"
               variant="outlined"
               onClick={getRandomAvatar}
-              // startIcon={<PersonIcon />}
+              startIcon={<PersonIcon />}
             >
               Random
             </Button>
@@ -65,7 +89,7 @@ function SignUp() {
                 label="Pseudo"
                 variant="outlined"
                 autoFocus="autofocus"
-                // onChange={(e) => setPseudo(e.target.value)}
+                onChange={(e) => setPseudo(e.target.value)}
               />
             </Grid>
             <Grid item xs={12} style={{ marginTop: "50px" }}>
@@ -75,6 +99,7 @@ function SignUp() {
                   variant="contained"
                   color="primary"
                   style={{ margin: "20px" }}
+                  onClick={Signup}
                 >
                   Signup
                 </Button>
