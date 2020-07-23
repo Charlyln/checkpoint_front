@@ -147,10 +147,6 @@ function Profil() {
                             <CardContent>
                               <List>
                                 <ListItem>
-                                  <Typography>{booking.startDate}</Typography>
-                                  <Typography>{booking.endDate}</Typography>
-                                </ListItem>
-                                <ListItem>
                                   <ListItemAvatar>
                                     <Avatar
                                       src={booking.User.avatar}
