@@ -25,6 +25,8 @@ import {
   Checkbox,
   Fade,
   ListItem,
+  ListItemAvatar,
+  ListItemText,
 } from "@material-ui/core";
 import Favorite from "@material-ui/icons/Favorite";
 import FavoriteBorder from "@material-ui/icons/FavoriteBorder";
@@ -33,6 +35,8 @@ import {
   KeyboardTimePicker,
   KeyboardDatePicker,
 } from "@material-ui/pickers";
+import RotateLeftIcon from "@material-ui/icons/RotateLeft";
+import SearchIcon from "@material-ui/icons/Search";
 
 function Home() {
   const [travels, setTravels] = useState([]);
@@ -45,8 +49,7 @@ function Home() {
   const [endDate, setEndDate] = useState(new Date());
   const [travelId, setTravelId] = useState("");
   const [startDate, setStartDate] = useState(new Date());
-
-  const Bookings = ["2020-07-26T22:55:17.000Z", "2020-07-24T22:55:17.000Z"];
+  const [bookingSend, setBookingSend] = useState(false);
 
   useEffect(() => {
     getTravels();
@@ -94,13 +97,20 @@ function Home() {
   };
   const search = (e) => {
     e.preventDefault();
-
-    const arrayFiltered2 = travels.filter(
-      (travel) => travel.localisation === city
-    );
-    setTravelsFiltered(arrayFiltered2);
+    if (city) {
+      const arrayFiltered2 = travels.filter((travel) =>
+        travel.localisation.includes(city)
+      );
+      setTravelsFiltered(arrayFiltered2);
+      setCity("");
+    }
   };
 
+  const reset = () => {
+    setTravelsFiltered(travels);
+    getTravels();
+    setCity("");
+  };
   const sendBooking = async (e) => {
     e.preventDefault();
 
@@ -113,6 +123,7 @@ function Home() {
           UserUuid,
           startDate,
           endDate,
+          accepted: "waiting",
         });
       }
     } catch (err) {
@@ -139,7 +150,11 @@ function Home() {
 
   return (
     <>
-      <Grid container alignItems="center" style={{ marginTop: "70px" }}>
+      <Grid
+        container
+        alignItems="center"
+        style={{ marginTop: "70px", marginBottom: "100px" }}
+      >
         <Grid container>
           <Grid item xs={12} sm={12} md={4} lg={4}>
             <Grid
@@ -154,13 +169,30 @@ function Home() {
                     <TextField
                       id="outlined-basic"
                       label="Where do you go ?"
+                      value={city}
                       variant="outlined"
                       onChange={(e) => setCity(e.target.value)}
                     />
                   </ListItem>
                   <ListItem>
-                    <Button type="submit" color="primary" variant="outlined">
+                    <Button
+                      type="submit"
+                      color="primary"
+                      variant="outlined"
+                      endIcon={<SearchIcon />}
+                    >
                       Search
+                    </Button>
+
+                    <Button
+                      type="submit"
+                      color="primary"
+                      variant="outlined"
+                      endIcon={<RotateLeftIcon />}
+                      style={{ marginLeft: "8px" }}
+                      onClick={reset}
+                    >
+                      Reset
                     </Button>
                   </ListItem>
                 </List>
@@ -191,17 +223,6 @@ function Home() {
                                 margin: "20px 0px",
                               }}
                             >
-                              <CardHeader
-                                avatar={
-                                  <Avatar
-                                    src={travel.User.avatar}
-                                    aria-label="recipe"
-                                  >
-                                    R
-                                  </Avatar>
-                                }
-                                title={travel.pseudo}
-                              />
                               <CardMedia
                                 style={{ height: 0, paddingTop: "56.25%" }}
                                 image={travel.imageUrl}
@@ -209,78 +230,120 @@ function Home() {
                               />
 
                               <CardContent>
-                                <Typography>{travel.title}</Typography>
-                              </CardContent>
-                              <CardContent>
-                                <Typography>{travel.description}</Typography>
+                                <Typography variant="h5">
+                                  {travel.title}
+                                </Typography>
                               </CardContent>
                               <CardContent>
                                 <Typography>{travel.localisation}</Typography>
                               </CardContent>
-
                               <CardContent>
-                                <DatePicker
-                                  selected={startDate}
-                                  onChange={(date) => setStartDate(date)}
-                                  excludeDates={dates}
-                                  placeholderText="Select a date other than today or yesterday"
-                                  popperPlacement="auto-left"
-                                  customInput={<ExampleCustomInput />}
-                                />
-                              </CardContent>
-                              <CardContent>
-                                <DatePicker
-                                  selected={endDate}
-                                  onChange={(date) => setEndDate(date)}
-                                  excludeDates={[
-                                    new Date(),
-                                  ]}
-                                  placeholderText="Select a date other than today or yesterday"
-                                  customInput={<ExampleCustomInput />}
-                                />
-                              </CardContent>
-                              {/* <CardContent>
-                                <DatePicker
-                                  selected={startDate}
-                                  onChange={(date) => setStartDate(date)}
-                                  filterDate={isWeekday}
-                                  placeholderText="Select a weekday"
-                                />
-                              </CardContent> */}
-
-                              <CardContent>
-                                <form onSubmit={sendBooking}>
-                                  <Button
-                                    type="submit"
-                                    color="primary"
-                                    variant="contained"
-                                    onClick={() => setTravelId(travel.uuid)}
-                                  >
-                                    Booking
-                                  </Button>
-                                </form>
+                                <Typography>{travel.description}</Typography>
                               </CardContent>
 
-                              <CardActions disableSpacing>
-                                <FormControlLabel
-                                  control={
-                                    <Checkbox
-                                      icon={<FavoriteBorder fontSize="small" />}
-                                      checkedIcon={
-                                        <Favorite fontSize="small" />
-                                      }
-                                      id={travel.uuid}
-                                      onChange={putLike}
-                                      checked={
-                                        travel.Likes.find(
-                                          (like) => like.UserUuid === UserId
-                                        )
-                                          ? true
-                                          : false
-                                      }
+                              {travel.UserUuid === UserId ? (
+                                ""
+                              ) : (
+                                <CardContent>
+                                  <List>
+                                    <ListItem>
+                                      <CardContent style={{ padding: "2px" }}>
+                                        <DatePicker
+                                          selected={startDate}
+                                          onChange={(date) =>
+                                            setStartDate(date)
+                                          }
+                                          excludeDates={dates}
+                                          placeholderText="Select a date other than today or yesterday"
+                                          popperPlacement="auto-left"
+                                          customInput={<ExampleCustomInput />}
+                                          popperPlacement="top-right"
+                                        />
+                                      </CardContent>
+                                      <CardContent style={{ padding: "2px" }}>
+                                        <DatePicker
+                                          selected={endDate}
+                                          onChange={(date) => setEndDate(date)}
+                                          excludeDates={[new Date()]}
+                                          placeholderText="Select a date other than today or yesterday"
+                                          customInput={<ExampleCustomInput />}
+                                          popperPlacement="top-right"
+                                        />
+                                      </CardContent>
+                                      <CardContent style={{ padding: "2px" }}>
+                                        <form onSubmit={sendBooking}>
+                                          {travelId === travel.uuid ? (
+                                            <Button
+                                              type="submit"
+                                              style={{
+                                                backgroundColor: "#4caf50",
+                                              }}
+                                              variant="contained"
+                                            >
+                                              Booking sent
+                                            </Button>
+                                          ) : (
+                                            <Button
+                                              type="submit"
+                                              color="primary"
+                                              variant="contained"
+                                              onClick={() =>
+                                                setTravelId(travel.uuid)
+                                              }
+                                            >
+                                              Booking
+                                            </Button>
+                                          )}
+                                        </form>
+                                      </CardContent>
+                                    </ListItem>
+                                  </List>
+                                </CardContent>
+                              )}
+
+                              <CardActions
+                                disableSpacing
+                                style={{ marginLeft: "5px" }}
+                              >
+                                <ListItem>
+                                  <ListItemAvatar>
+                                    <Avatar
+                                      src={travel.User.avatar}
+                                      aria-label="recipe"
                                     />
-                                  }
-                                />
+                                  </ListItemAvatar>
+
+                                  {travel.UserUuid === UserId ? (
+                                    <ListItemText primary={`Post by Me`} />
+                                  ) : (
+                                    <ListItemText
+                                      primary={`Post by ${travel.User.pseudo}`}
+                                    />
+                                  )}
+                                </ListItem>
+
+                                {travel.UserUuid === UserId ? (
+                                  ""
+                                ) : (
+                                  <FormControlLabel
+                                    style={{ marginLeft: "auto" }}
+                                    control={
+                                      <Checkbox
+                                        icon={<FavoriteBorder />}
+                                        checkedIcon={<Favorite />}
+                                        id={travel.uuid}
+                                        onChange={putLike}
+                                        checked={
+                                          travel.Likes.find(
+                                            (like) => like.UserUuid === UserId
+                                          )
+                                            ? true
+                                            : false
+                                        }
+                                      />
+                                    }
+                                  />
+                                )}
                               </CardActions>
                             </Card>
                           </Paper>

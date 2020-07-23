@@ -28,6 +28,7 @@ import { Redirect } from "react-router-dom";
 import DatePicker from "react-datepicker";
 import SendIcon from "@material-ui/icons/Send";
 import CheckIcon from "@material-ui/icons/Check";
+import CloseIcon from "@material-ui/icons/Close";
 
 import { apiUrl } from "../../apiUrl";
 
@@ -75,12 +76,19 @@ function Profil() {
     }
   };
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      getMyTravels();
+    }, 2000);
+    return () => clearInterval(interval);
+  }, []);
+
   const acceptBooking = async (e) => {
     e.preventDefault();
 
     try {
       await Axios.put(`${apiUrl}/bookings/${bookingId}`, {
-        accepted: true,
+        accepted: "confirmed",
       });
     } catch (err) {
       console.log(err);
@@ -117,17 +125,6 @@ function Profil() {
                           margin: "20px 0px",
                         }}
                       >
-                        <CardHeader
-                          avatar={
-                            <Avatar
-                              src={travel.User.avatar}
-                              aria-label="recipe"
-                            >
-                              R
-                            </Avatar>
-                          }
-                          title={travel.pseudo}
-                        />
                         <CardMedia
                           style={{ height: 0, paddingTop: "56.25%" }}
                           image={travel.imageUrl}
@@ -137,16 +134,22 @@ function Profil() {
                           <Typography gutterBottom>{travel.title}</Typography>
                         </CardContent>
                         <CardContent>
-                          <Typography variant="h4" gutterBottom>
-                            Bookings
-                          </Typography>
+                          {travel.Bookings.length === 0 ? (
+                            <Button color="primary" variant="outlined">
+                              You don't have bookings yet
+                            </Button>
+                          ) : (
+                            <Typography variant="h5" gutterBottom>
+                              Bookings
+                            </Typography>
+                          )}
                         </CardContent>
                         <Divider />
                         {travel.Bookings.map((booking) => (
                           <>
                             <CardContent>
                               <List>
-                                <ListItem>
+                                <ListItem style={{ width: " max-content" }}>
                                   <ListItemAvatar>
                                     <Avatar
                                       src={booking.User.avatar}
@@ -155,55 +158,79 @@ function Profil() {
                                   </ListItemAvatar>
                                   <ListItemText primary={booking.User.pseudo} />
                                 </ListItem>
+                                <ListItem>
+                                  <CardContent style={{ padding: "2px" }}>
+                                    <DatePicker
+                                      selected={new Date(booking.startDate)}
+                                      // onChange={(date) => setStartDate(date)}
+                                      // excludeDates={dates}
+                                      placeholderText="Select a date other than today or yesterday"
+                                      popperPlacement="auto-left"
+                                      customInput={<ExampleCustomInput />}
+                                    />
+                                  </CardContent>
+                                  <CardContent style={{ padding: "2px" }}>
+                                    <DatePicker
+                                      selected={new Date(booking.endDate)}
+                                      // onChange={(date) => setEndDate(date)}
+                                      // excludeDates={[new Date()]}
+                                      placeholderText="Select a date other than today or yesterday"
+                                      customInput={<ExampleCustomInput />}
+                                    />
+                                  </CardContent>
+                                  <CardContent style={{ padding: "2px" }}>
+                                    <form onSubmit={acceptBooking}>
+                                      {booking.accepted === "confirmed" ? (
+                                        <>
+                                          <Button
+                                            type="submit"
+                                            style={{
+                                              backgroundColor: "#4caf50",
+                                            }}
+                                            variant="contained"
+                                            endIcon={<CheckIcon />}
+                                          >
+                                            You Confirmed
+                                          </Button>
+                                          <Button
+                                            style={{
+                                              backgroundColor: "#e91e63",
+                                            }}
+                                            variant="contained"
+                                          >
+                                            <CloseIcon />
+                                          </Button>
+                                        </>
+                                      ) : booking.accepted === "waiting" ? (
+                                        <Button
+                                          size="small"
+                                          type="submit"
+                                          color="primary"
+                                          variant="contained"
+                                          endIcon={<SendIcon />}
+                                          onClick={(e) =>
+                                            setBookingID(booking.uuid)
+                                          }
+                                        >
+                                          Accept
+                                        </Button>
+                                      ) : (
+                                        <Button
+                                          style={{
+                                            backgroundColor: "#e91e63",
+                                          }}
+                                          variant="contained"
+                                          endIcon={<CloseIcon />}
+                                        >
+                                          Canceled
+                                        </Button>
+                                      )}
+                                    </form>
+                                  </CardContent>
+                                </ListItem>
                               </List>
                             </CardContent>
-                            <CardContent>
-                              <DatePicker
-                                selected={
-                                  new Date(travel.Bookings[0].startDate)
-                                }
-                                // onChange={(date) => setStartDate(date)}
-                                // excludeDates={dates}
-                                placeholderText="Select a date other than today or yesterday"
-                                popperPlacement="auto-left"
-                                customInput={<ExampleCustomInput />}
-                              />
-                            </CardContent>
-                            <CardContent>
-                              <DatePicker
-                                selected={new Date(travel.Bookings[0].endDate)}
-                                // onChange={(date) => setEndDate(date)}
-                                // excludeDates={[new Date()]}
-                                placeholderText="Select a date other than today or yesterday"
-                                customInput={<ExampleCustomInput />}
-                              />
-                            </CardContent>
-                            <CardContent>
-                              <form onSubmit={acceptBooking}>
-                                {travel.Bookings[0].accepted ? (
-                                  <Button
-                                    type="submit"
-                                    style={{ backgroundColor: "#4caf50" }}
-                                    variant="contained"
-                                    endIcon={<CheckIcon />}
-                                  >
-                                    Confirmed
-                                  </Button>
-                                ) : (
-                                  <Button
-                                    type="submit"
-                                    color="primary"
-                                    variant="contained"
-                                    endIcon={<SendIcon />}
-                                    onClick={(e) =>
-                                      setBookingID(travel.Bookings[0].uuid)
-                                    }
-                                  >
-                                    Accept
-                                  </Button>
-                                )}
-                              </form>
-                            </CardContent>
+
                             <Divider />
                           </>
                         ))}

@@ -41,7 +41,7 @@ function SignUp() {
   return (
     <>
       <Grid container>
-        <Grid item xs={12} style={{ marginTop: "200px" }}>
+        <Grid item xs={12} style={{ marginTop: "130px" }}>
           <Grid container justify="center">
             {/* <input
               accept="image/*"

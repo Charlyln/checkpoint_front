@@ -1,9 +1,11 @@
+import "date-fns";
 import React, { useState, useEffect } from "react";
 import Axios from "axios";
 import { apiUrl } from "../../apiUrl";
 import List from "@material-ui/core/List";
-import Favorite from "@material-ui/icons/Favorite";
-import FavoriteBorder from "@material-ui/icons/FavoriteBorder";
+import DateFnsUtils from "@date-io/date-fns";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 import {
   TextField,
@@ -23,13 +25,30 @@ import {
   Checkbox,
   Fade,
   ListItem,
+  ListItemAvatar,
+  ListItemText,
 } from "@material-ui/core";
+import Favorite from "@material-ui/icons/Favorite";
+import FavoriteBorder from "@material-ui/icons/FavoriteBorder";
+import {
+  MuiPickersUtilsProvider,
+  KeyboardTimePicker,
+  KeyboardDatePicker,
+} from "@material-ui/pickers";
+import RotateLeftIcon from "@material-ui/icons/RotateLeft";
+import SearchIcon from "@material-ui/icons/Search";
 
 function Favorites() {
   const [travels, setTravels] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [UserId, setUserId] = useState("");
   const [userdata, setuserdata] = useState([]);
+  const [city, setCity] = useState("");
+  const [travelsFiltered, setTravelsFiltered] = useState([]);
+  const [endDate, setEndDate] = useState(new Date());
+  const [travelId, setTravelId] = useState("");
+  const [startDate, setStartDate] = useState(new Date());
+  const [bookingSend, setBookingSend] = useState(false);
 
   useEffect(() => {
     getTravels();
@@ -75,6 +94,38 @@ function Favorites() {
     }
   };
 
+  const sendBooking = async (e) => {
+    e.preventDefault();
+
+    try {
+      if (startDate && endDate) {
+        const UserUuid = window.localStorage.getItem("uuid");
+
+        const res = await Axios.post(`${apiUrl}/bookings`, {
+          TravelUuid: travelId,
+          UserUuid,
+          startDate,
+          endDate,
+          accepted: "waiting",
+        });
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const ExampleCustomInput = ({ value, onClick }) => (
+    <Button
+      type="submit"
+      color="primary"
+      variant="outlined"
+      className="example-custom-input"
+      onClick={onClick}
+    >
+      {value}
+    </Button>
+  );
+
   return (
     <>
       <Grid container alignItems="center" style={{ marginTop: "70px" }}>
@@ -105,17 +156,6 @@ function Favorites() {
                               margin: "20px 0px",
                             }}
                           >
-                            <CardHeader
-                              avatar={
-                                <Avatar
-                                  src={travel.User.avatar}
-                                  aria-label="recipe"
-                                >
-                                  R
-                                </Avatar>
-                              }
-                              title={travel.pseudo}
-                            />
                             <CardMedia
                               style={{ height: 0, paddingTop: "56.25%" }}
                               image={travel.imageUrl}
@@ -123,17 +163,77 @@ function Favorites() {
                             />
 
                             <CardContent>
-                              <Typography>{travel.content}</Typography>
+                              <Typography variant="h5">
+                                {travel.title}
+                              </Typography>
                             </CardContent>
                             <CardContent>
                               <Typography>{travel.localisation}</Typography>
                             </CardContent>
-                            <CardActions disableSpacing>
+                            <CardContent>
+                              <Typography>{travel.description}</Typography>
+                            </CardContent>
+
+                            <CardContent>
+                              <List>
+                                <ListItem>
+                                  <CardContent style={{ padding: "2px" }}>
+                                    <DatePicker
+                                      selected={startDate}
+                                      onChange={(date) => setStartDate(date)}
+                                      placeholderText="Select a date other than today or yesterday"
+                                      popperPlacement="auto-left"
+                                      customInput={<ExampleCustomInput />}
+                                    />
+                                  </CardContent>
+                                  <CardContent style={{ padding: "2px" }}>
+                                    <DatePicker
+                                      selected={endDate}
+                                      onChange={(date) => setEndDate(date)}
+                                      excludeDates={[new Date()]}
+                                      placeholderText="Select a date other than today or yesterday"
+                                      customInput={<ExampleCustomInput />}
+                                    />
+                                  </CardContent>
+                                  <CardContent style={{ padding: "2px" }}>
+                                    <form onSubmit={sendBooking}>
+                                      {travelId === travel.uuid ? (
+                                        <Button
+                                          type="submit"
+                                          style={{
+                                            backgroundColor: "#4caf50",
+                                          }}
+                                          variant="contained"
+                                        >
+                                          Booking sent
+                                        </Button>
+                                      ) : (
+                                        <Button
+                                          type="submit"
+                                          color="primary"
+                                          variant="contained"
+                                          onClick={() =>
+                                            setTravelId(travel.uuid)
+                                          }
+                                        >
+                                          Booking
+                                        </Button>
+                                      )}
+                                    </form>
+                                  </CardContent>
+                                </ListItem>
+                              </List>
+                            </CardContent>
+
+                            <CardActions
+                              disableSpacing
+                              style={{ marginLeft: "5px" }}
+                            >
                               <FormControlLabel
                                 control={
                                   <Checkbox
-                                    icon={<FavoriteBorder fontSize="small" />}
-                                    checkedIcon={<Favorite fontSize="small" />}
+                                    icon={<FavoriteBorder />}
+                                    checkedIcon={<Favorite />}
                                     id={travel.uuid}
                                     onChange={putLike}
                                     checked={
@@ -146,6 +246,17 @@ function Favorites() {
                                   />
                                 }
                               />
+                              <ListItem style={{ marginLeft: "50%" }}>
+                                <ListItemAvatar>
+                                  <Avatar
+                                    src={travel.User.avatar}
+                                    aria-label="recipe"
+                                  />
+                                </ListItemAvatar>
+                                <ListItemText
+                                  primary={`Post by ${travel.User.pseudo}`}
+                                />
+                              </ListItem>
                             </CardActions>
                           </Card>
                         </Paper>

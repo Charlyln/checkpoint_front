@@ -60,6 +60,7 @@ const Post = () => {
           UserUuid: UserId,
           imageUrl: res.data.data.link,
           localisation,
+          description,
           title,
         });
       }

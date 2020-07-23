@@ -27,6 +27,9 @@ import {
   Checkbox,
   Fade,
   ListItem,
+  ListItemAvatar,
+  ListItemText,
+  Divider,
 } from "@material-ui/core";
 import Favorite from "@material-ui/icons/Favorite";
 import FavoriteBorder from "@material-ui/icons/FavoriteBorder";
@@ -35,6 +38,7 @@ import {
   KeyboardTimePicker,
   KeyboardDatePicker,
 } from "@material-ui/pickers";
+import CloseIcon from "@material-ui/icons/Close";
 
 function Booking() {
   const [travels, setTravels] = useState([]);
@@ -47,8 +51,6 @@ function Booking() {
   const [endDate, setEndDate] = useState(new Date());
   const [travelId, setTravelId] = useState("");
   const [startDate, setStartDate] = useState(new Date());
-
-  const Bookings = ["2020-07-26T22:55:17.000Z", "2020-07-24T22:55:17.000Z"];
 
   useEffect(() => {
     getTravels();
@@ -101,33 +103,33 @@ function Booking() {
       console.log(err);
     }
   };
-  const search = (e) => {
-    e.preventDefault();
+  // const search = (e) => {
+  //   e.preventDefault();
 
-    const arrayFiltered2 = travels.filter(
-      (travel) => travel.localisation === city
-    );
-    setTravelsFiltered(arrayFiltered2);
-  };
+  //   const arrayFiltered2 = travels.filter(
+  //     (travel) => travel.localisation === city
+  //   );
+  //   setTravelsFiltered(arrayFiltered2);
+  // };
 
-  const sendBooking = async (e) => {
-    e.preventDefault();
+  // const sendBooking = async (e) => {
+  //   e.preventDefault();
 
-    try {
-      if (startDate && endDate) {
-        const UserUuid = window.localStorage.getItem("uuid");
+  //   try {
+  //     if (startDate && endDate) {
+  //       const UserUuid = window.localStorage.getItem("uuid");
 
-        const res = await Axios.post(`${apiUrl}/bookings`, {
-          TravelUuid: travelId,
-          UserUuid,
-          startDate,
-          endDate,
-        });
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  };
+  //       const res = await Axios.post(`${apiUrl}/bookings`, {
+  //         TravelUuid: travelId,
+  //         UserUuid,
+  //         startDate,
+  //         endDate,
+  //       });
+  //     }
+  //   } catch (err) {
+  //     console.log(err);
+  //   }
+  // };
 
   const ExampleCustomInput = ({ value, onClick }) => (
     <Button
@@ -167,6 +169,7 @@ function Booking() {
                           (element) => element.UserUuid === UserId
                         )
                       )
+                      .filter((travel) => travel.UserUuid !== UserId)
                       .map((travel) => {
                         const dates = travel.Bookings.map(
                           (Booking) => new Date(Booking.startDate)
@@ -179,17 +182,6 @@ function Booking() {
                                 margin: "20px 0px",
                               }}
                             >
-                              <CardHeader
-                                avatar={
-                                  <Avatar
-                                    src={travel.User.avatar}
-                                    aria-label="recipe"
-                                  >
-                                    R
-                                  </Avatar>
-                                }
-                                title={travel.pseudo}
-                              />
                               <CardMedia
                                 style={{ height: 0, paddingTop: "56.25%" }}
                                 image={travel.imageUrl}
@@ -206,68 +198,156 @@ function Booking() {
                                 <Typography>{travel.localisation}</Typography>
                               </CardContent>
 
-                              <CardContent>
-                                <DatePicker
-                                  selected={
-                                    new Date(travel.Bookings[0].startDate)
-                                  }
-                                  onChange={(date) => setStartDate(date)}
-                                  excludeDates={dates}
-                                  placeholderText="Select a date other than today or yesterday"
-                                  popperPlacement="auto-left"
-                                  customInput={<ExampleCustomInput />}
-                                />
-                              </CardContent>
-                              <CardContent>
-                                <DatePicker
-                                  selected={
-                                    new Date(travel.Bookings[0].endDate)
-                                  }
-                                  onChange={(date) => setEndDate(date)}
-                                  excludeDates={[new Date()]}
-                                  placeholderText="Select a date other than today or yesterday"
-                                  customInput={<ExampleCustomInput />}
-                                />
-                              </CardContent>
-                              {/* <CardContent>
-                                <DatePicker
-                                  selected={startDate}
-                                  onChange={(date) => setStartDate(date)}
-                                  filterDate={isWeekday}
-                                  placeholderText="Select a weekday"
-                                />
-                              </CardContent> */}
+                              {travel.Bookings.filter(
+                                (booking) => booking.UserUuid === UserId
+                              ).map((booking) => (
+                                <>
+                                  <CardContent>
+                                    <List>
+                                      <ListItem
+                                        style={{ width: " max-content" }}
+                                      >
+                                        <ListItemAvatar>
+                                          <Avatar
+                                            src={booking.User.avatar}
+                                            aria-label="recipe"
+                                          />
+                                        </ListItemAvatar>
+                                        <ListItemText
+                                          primary={booking.User.pseudo}
+                                        />
+                                      </ListItem>
+                                      <ListItem>
+                                        <CardContent style={{ padding: "2px" }}>
+                                          <DatePicker
+                                            selected={
+                                              new Date(
+                                                travel.Bookings[0].startDate
+                                              )
+                                            }
+                                            // onChange={(date) => setStartDate(date)}
+                                            // excludeDates={dates}
+                                            placeholderText="Select a date other than today or yesterday"
+                                            popperPlacement="auto-left"
+                                            customInput={<ExampleCustomInput />}
+                                          />
+                                        </CardContent>
+                                        <CardContent style={{ padding: "2px" }}>
+                                          <DatePicker
+                                            selected={
+                                              new Date(
+                                                travel.Bookings[0].endDate
+                                              )
+                                            }
+                                            // onChange={(date) => setEndDate(date)}
+                                            // excludeDates={[new Date()]}
+                                            placeholderText="Select a date other than today or yesterday"
+                                            customInput={<ExampleCustomInput />}
+                                          />
+                                        </CardContent>
+                                        <CardContent style={{ padding: "2px" }}>
+                                          <form>
+                                            {booking.accepted ===
+                                            "confirmed" ? (
+                                              <Button
+                                                type="submit"
+                                                style={{
+                                                  backgroundColor: "#4caf50",
+                                                }}
+                                                variant="contained"
+                                                endIcon={<CheckIcon />}
+                                              >
+                                                Confirmed
+                                              </Button>
+                                            ) : booking.accepted ===
+                                              "waiting" ? (
+                                              <Button
+                                                style={{
+                                                  backgroundColor: "#ffc400",
+                                                }}
+                                                variant="contained"
+                                                endIcon={<HourglassEmptyIcon />}
+                                              >
+                                                Waiting
+                                              </Button>
+                                            ) : (
+                                              <Button
+                                                style={{
+                                                  backgroundColor: "#e91e63",
+                                                }}
+                                                variant="contained"
+                                                endIcon={<CloseIcon />}
+                                              >
+                                                Canceled
+                                              </Button>
+                                            )}
+                                          </form>
+                                        </CardContent>
+                                      </ListItem>
+                                    </List>
+                                  </CardContent>
 
-                              <CardContent>
-                                {travel.Bookings[0].accepted ? (
-                                  <Button
-                                    type="submit"
-                                    style={{ backgroundColor: "#4caf50" }}
-                                    variant="contained"
-                                    endIcon={<CheckIcon />}
-                                  >
-                                    Confirmed
-                                  </Button>
-                                ) : (
-                                  <Button
-                                    type="submit"
-                                    style={{ backgroundColor: "#ffc400" }}
-                                    variant="contained"
-                                    endIcon={<HourglassEmptyIcon />}
-                                  >
-                                    Waiting
-                                  </Button>
-                                )}
-                              </CardContent>
+                                  <Divider />
+                                </>
+                              ))}
+
+                              {/* <CardContent>
+                                <List>
+                                  <ListItem>
+                                    <CardContent style={{ padding: "2px" }}>
+                                      <DatePicker
+                                        selected={
+                                          new Date(travel.Bookings[0].startDate)
+                                        }
+                                        onChange={(date) => setStartDate(date)}
+                                        excludeDates={dates}
+                                        placeholderText="Select a date other than today or yesterday"
+                                        popperPlacement="auto-left"
+                                        customInput={<ExampleCustomInput />}
+                                      />
+                                    </CardContent>
+                                    <CardContent style={{ padding: "2px" }}>
+                                      <DatePicker
+                                        selected={
+                                          new Date(travel.Bookings[0].endDate)
+                                        }
+                                        onChange={(date) => setEndDate(date)}
+                                        excludeDates={[new Date()]}
+                                        placeholderText="Select a date other than today or yesterday"
+                                        customInput={<ExampleCustomInput />}
+                                      />
+                                    </CardContent>
+                                    <CardContent style={{ padding: "2px" }}>
+                                      {travel.Bookings[0].accepted ? (
+                                        <Button
+                                          type="submit"
+                                          style={{ backgroundColor: "#4caf50" }}
+                                          variant="contained"
+                                          endIcon={<CheckIcon />}
+                                        >
+                                          Confirmed
+                                        </Button>
+                                      ) : (
+                                        <Button
+                                          type="submit"
+                                          style={{ backgroundColor: "#ffc400" }}
+                                          variant="contained"
+                                          endIcon={<HourglassEmptyIcon />}
+                                        >
+                                          Waiting
+                                        </Button>
+                                      )}
+                                    </CardContent>
+                                  </ListItem>
+                                </List>
+                              </CardContent> */}
 
                               <CardActions disableSpacing>
                                 <FormControlLabel
                                   control={
                                     <Checkbox
-                                      icon={<FavoriteBorder fontSize="small" />}
-                                      checkedIcon={
-                                        <Favorite fontSize="small" />
-                                      }
+                                      icon={<FavoriteBorder />}
+                                      checkedIcon={<Favorite />}
                                       id={travel.uuid}
                                       onChange={putLike}
                                       checked={
@@ -280,6 +360,17 @@ function Booking() {
                                     />
                                   }
                                 />
+                                <ListItem style={{ marginLeft: "50%" }}>
+                                  <ListItemAvatar>
+                                    <Avatar
+                                      src={travel.User.avatar}
+                                      aria-label="recipe"
+                                    />
+                                  </ListItemAvatar>
+                                  <ListItemText
+                                    primary={`Post by ${travel.User.pseudo}`}
+                                  />
+                                </ListItem>
                               </CardActions>
                             </Card>
                           </Paper>
