@@ -1,0 +1,9 @@
+@media screen and (max-width: 640px) {
+  .appBar {
+    top: unset !important;
+    bottom: 0 !important;
+  }
+  .appLinks {
+    margin: auto !important;
+  }
+}
