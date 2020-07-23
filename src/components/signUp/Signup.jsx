@@ -43,6 +43,7 @@ function SignUp() {
       <Grid container>
         <Grid item xs={12} style={{ marginTop: "130px" }}>
           <Grid container justify="center">
+            {isLoading ? "Isloading " : ""}
             {/* <input
               accept="image/*"
               style={{ display: "none" }}

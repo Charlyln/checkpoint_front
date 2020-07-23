@@ -1,30 +1,20 @@
 import React, { useState, useEffect } from "react";
 import Axios from "axios";
 import {
-  TextField,
   Avatar,
   Button,
   Grid,
-  Snackbar,
-  CardHeader,
   Card,
   CardMedia,
   CardContent,
   Typography,
-  CardActions,
   Paper,
-  IconButton,
-  FormControlLabel,
-  Checkbox,
-  Fade,
   List,
   ListItem,
   Divider,
   ListItemAvatar,
   ListItemText,
 } from "@material-ui/core";
-import PersonIcon from "@material-ui/icons/Person";
-import { Redirect } from "react-router-dom";
 import DatePicker from "react-datepicker";
 import SendIcon from "@material-ui/icons/Send";
 import CheckIcon from "@material-ui/icons/Check";
