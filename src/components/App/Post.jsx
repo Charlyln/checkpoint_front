@@ -19,7 +19,6 @@ import PhotoIcon from "@material-ui/icons/Photo";
 
 const Post = () => {
   const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
   const [photo, setPhoto] = useState("");
   const [imageCard, setImageCard] = useState("");
   const [localisation, setLocalisation] = useState("");
@@ -56,7 +55,6 @@ const Post = () => {
           },
         });
         await Axios.post(`${apiUrl}/travels`, {
-          content,
           UserUuid: UserId,
           imageUrl: res.data.data.link,
           localisation,

@@ -3,26 +3,21 @@ import React, { useState, useEffect } from "react";
 import Axios from "axios";
 import { apiUrl } from "../../apiUrl";
 import List from "@material-ui/core/List";
-import DateFnsUtils from "@date-io/date-fns";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import HourglassEmptyIcon from "@material-ui/icons/HourglassEmpty";
 import CheckIcon from "@material-ui/icons/Check";
 
 import {
-  TextField,
   Button,
   Avatar,
   Grid,
-  Snackbar,
-  CardHeader,
   Card,
   CardMedia,
   CardContent,
   Typography,
   CardActions,
   Paper,
-  IconButton,
   FormControlLabel,
   Checkbox,
   Fade,
@@ -33,24 +28,16 @@ import {
 } from "@material-ui/core";
 import Favorite from "@material-ui/icons/Favorite";
 import FavoriteBorder from "@material-ui/icons/FavoriteBorder";
-import {
-  MuiPickersUtilsProvider,
-  KeyboardTimePicker,
-  KeyboardDatePicker,
-} from "@material-ui/pickers";
+
 import CloseIcon from "@material-ui/icons/Close";
 
 function Booking() {
   const [travels, setTravels] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [city, setCity] = useState("");
   const [travelsFiltered, setTravelsFiltered] = useState([]);
   const [userdata, setuserdata] = useState([]);
   const [UserId, setUserId] = useState("");
-  // const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState(new Date());
-  const [travelId, setTravelId] = useState("");
-  const [startDate, setStartDate] = useState(new Date());
+
   const [bookingIdForCancel, setBookingIDForCancel] = useState("");
 
   useEffect(() => {
@@ -168,7 +155,7 @@ function Booking() {
         <Grid container>
           <Grid item xs={12} sm={12} md={8} lg={8}>
             <Grid container alignItems="center" justify="center">
-               
+               {travels ? "" : ""}
               {isLoading ? (
                 <h1>loading</h1>
               ) : (
@@ -185,9 +172,9 @@ function Booking() {
                       )
                       .filter((travel) => travel.UserUuid !== UserId)
                       .map((travel) => {
-                        const dates = travel.Bookings.map(
-                          (Booking) => new Date(Booking.startDate)
-                        );
+                        // const dates = travel.Bookings.map(
+                        //   (Booking) => new Date(Booking.startDate)
+                        // );
                         return (
                           <Paper elevation={5}>
                             <Card

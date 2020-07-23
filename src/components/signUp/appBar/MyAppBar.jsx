@@ -1,27 +1,19 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import IconButton from "@material-ui/core/IconButton";
 import HomeIcon from "@material-ui/icons/Home";
-import { Link, Redirect, useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import PersonIcon from "@material-ui/icons/Person";
 import PostAddIcon from "@material-ui/icons/PostAdd";
 import FavoriteIcon from "@material-ui/icons/Favorite";
 import FlightTakeoffIcon from "@material-ui/icons/FlightTakeoff";
 import { useLocation } from "react-router";
-import HomeOutlinedIcon from "@material-ui/icons/HomeOutlined";
-import PersonOutlineOutlinedIcon from "@material-ui/icons/PersonOutlineOutlined";
 
 import "./myAppBar.css";
 
 export default function MyAppBar() {
-  const page = useLocation();
-
   const [page2, setPage2] = useState(useLocation().pathname);
-
-  const getPage = (e) => {
-    console.log(e.target);
-  };
 
   return (
     <AppBar className="appBar">

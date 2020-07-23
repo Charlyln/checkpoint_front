@@ -3,24 +3,19 @@ import React, { useState, useEffect } from "react";
 import Axios from "axios";
 import { apiUrl } from "../../apiUrl";
 import List from "@material-ui/core/List";
-import DateFnsUtils from "@date-io/date-fns";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 import {
-  TextField,
   Button,
   Avatar,
   Grid,
-  Snackbar,
-  CardHeader,
   Card,
   CardMedia,
   CardContent,
   Typography,
   CardActions,
   Paper,
-  IconButton,
   FormControlLabel,
   Checkbox,
   Fade,
@@ -30,25 +25,16 @@ import {
 } from "@material-ui/core";
 import Favorite from "@material-ui/icons/Favorite";
 import FavoriteBorder from "@material-ui/icons/FavoriteBorder";
-import {
-  MuiPickersUtilsProvider,
-  KeyboardTimePicker,
-  KeyboardDatePicker,
-} from "@material-ui/pickers";
-import RotateLeftIcon from "@material-ui/icons/RotateLeft";
-import SearchIcon from "@material-ui/icons/Search";
 
 function Favorites() {
   const [travels, setTravels] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [UserId, setUserId] = useState("");
   const [userdata, setuserdata] = useState([]);
-  const [city, setCity] = useState("");
-  const [travelsFiltered, setTravelsFiltered] = useState([]);
+
   const [endDate, setEndDate] = useState(new Date());
   const [travelId, setTravelId] = useState("");
   const [startDate, setStartDate] = useState(new Date());
-  const [bookingSend, setBookingSend] = useState(false);
 
   useEffect(() => {
     getTravels();
@@ -101,7 +87,7 @@ function Favorites() {
       if (startDate && endDate) {
         const UserUuid = window.localStorage.getItem("uuid");
 
-        const res = await Axios.post(`${apiUrl}/bookings`, {
+        await Axios.post(`${apiUrl}/bookings`, {
           TravelUuid: travelId,
           UserUuid,
           startDate,
