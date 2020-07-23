@@ -88,19 +88,20 @@ function Profil() {
     e.preventDefault();
 
     try {
-      if (bookingId) {
-        await Axios.put(`${apiUrl}/bookings/${bookingId}`, {
-          accepted: "confirmed",
-        });
-      } else if (bookingIdForCancel) {
+      if (bookingIdForCancel) {
         await Axios.put(`${apiUrl}/bookings/${bookingIdForCancel}`, {
           accepted: "canceled",
+        });
+      } else if (bookingId) {
+        await Axios.put(`${apiUrl}/bookings/${bookingId}`, {
+          accepted: "confirmed",
         });
       }
     } catch (err) {
       console.log(err);
     }
     getMyTravels();
+    getUserData();
   };
 
   return (
@@ -216,7 +217,6 @@ function Profil() {
                                         </>
                                       ) : booking.accepted === "waiting" ? (
                                         <Button
-                                          size="small"
                                           type="submit"
                                           color="primary"
                                           variant="contained"
