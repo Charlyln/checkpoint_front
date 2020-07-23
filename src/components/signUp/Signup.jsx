@@ -5,7 +5,6 @@ import { TextField, Avatar, Button } from "@material-ui/core";
 import PersonIcon from "@material-ui/icons/Person";
 import { Redirect } from "react-router-dom";
 
-
 import { apiUrl } from "../../apiUrl";
 
 function SignUp() {
@@ -28,6 +27,7 @@ function SignUp() {
           avatar: logo,
         });
         window.localStorage.setItem("uuid", res.data.uuid);
+        setisLoading(true);
       }
     } catch (err) {
       console.log(err);
