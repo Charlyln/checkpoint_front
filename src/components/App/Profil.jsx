@@ -37,6 +37,7 @@ function Profil() {
   const [isLoading, setIsLoading] = useState(true);
   const [myTravels, setMyTravels] = useState([]);
   const [bookingId, setBookingID] = useState("");
+  const [bookingIdForCancel, setBookingIDForCancel] = useState("");
 
   useEffect(() => {
     getUserData();
@@ -83,13 +84,19 @@ function Profil() {
     return () => clearInterval(interval);
   }, []);
 
-  const acceptBooking = async (e) => {
+  const changeBooking = async (e) => {
     e.preventDefault();
 
     try {
-      await Axios.put(`${apiUrl}/bookings/${bookingId}`, {
-        accepted: "confirmed",
-      });
+      if (bookingId) {
+        await Axios.put(`${apiUrl}/bookings/${bookingId}`, {
+          accepted: "confirmed",
+        });
+      } else if (bookingIdForCancel) {
+        await Axios.put(`${apiUrl}/bookings/${bookingIdForCancel}`, {
+          accepted: "canceled",
+        });
+      }
     } catch (err) {
       console.log(err);
     }
@@ -179,7 +186,7 @@ function Profil() {
                                     />
                                   </CardContent>
                                   <CardContent style={{ padding: "2px" }}>
-                                    <form onSubmit={acceptBooking}>
+                                    <form onSubmit={changeBooking}>
                                       {booking.accepted === "confirmed" ? (
                                         <>
                                           <Button
@@ -193,10 +200,16 @@ function Profil() {
                                             You Confirmed
                                           </Button>
                                           <Button
+                                            type="submit"
                                             style={{
                                               backgroundColor: "#e91e63",
                                             }}
                                             variant="contained"
+                                            onClick={(e) =>
+                                              setBookingIDForCancel(
+                                                booking.uuid
+                                              )
+                                            }
                                           >
                                             <CloseIcon />
                                           </Button>

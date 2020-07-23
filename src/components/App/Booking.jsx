@@ -51,6 +51,7 @@ function Booking() {
   const [endDate, setEndDate] = useState(new Date());
   const [travelId, setTravelId] = useState("");
   const [startDate, setStartDate] = useState(new Date());
+  const [bookingIdForCancel, setBookingIDForCancel] = useState("");
 
   useEffect(() => {
     getTravels();
@@ -90,6 +91,19 @@ function Booking() {
     }
     getTravels();
     getUser();
+  };
+
+  const changeBooking = async (e) => {
+    e.preventDefault();
+
+    try {
+      await Axios.put(`${apiUrl}/bookings/${bookingIdForCancel}`, {
+        accepted: "canceled",
+      });
+    } catch (err) {
+      console.log(err);
+    }
+    getTravels();
   };
 
   const getTravels = async () => {
@@ -246,19 +260,34 @@ function Booking() {
                                           />
                                         </CardContent>
                                         <CardContent style={{ padding: "2px" }}>
-                                          <form>
+                                          <form onSubmit={changeBooking}>
                                             {booking.accepted ===
                                             "confirmed" ? (
-                                              <Button
-                                                type="submit"
-                                                style={{
-                                                  backgroundColor: "#4caf50",
-                                                }}
-                                                variant="contained"
-                                                endIcon={<CheckIcon />}
-                                              >
-                                                Confirmed
-                                              </Button>
+                                              <>
+                                                <Button
+                                                  style={{
+                                                    backgroundColor: "#4caf50",
+                                                  }}
+                                                  variant="contained"
+                                                  endIcon={<CheckIcon />}
+                                                >
+                                                  Confirmed
+                                                </Button>
+                                                <Button
+                                                  type="submit"
+                                                  style={{
+                                                    backgroundColor: "#e91e63",
+                                                  }}
+                                                  variant="contained"
+                                                  onClick={(e) =>
+                                                    setBookingIDForCancel(
+                                                      booking.uuid
+                                                    )
+                                                  }
+                                                >
+                                                  <CloseIcon />
+                                                </Button>
+                                              </>
                                             ) : booking.accepted ===
                                               "waiting" ? (
                                               <Button
