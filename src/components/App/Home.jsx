@@ -22,12 +22,14 @@ import {
   ListItem,
   ListItemAvatar,
   ListItemText,
+  CircularProgress,
 } from "@material-ui/core";
 import Favorite from "@material-ui/icons/Favorite";
 import FavoriteBorder from "@material-ui/icons/FavoriteBorder";
-
 import RotateLeftIcon from "@material-ui/icons/RotateLeft";
 import SearchIcon from "@material-ui/icons/Search";
+
+import "./home.css";
 
 function Home() {
   const [travels, setTravels] = useState([]);
@@ -39,6 +41,9 @@ function Home() {
   const [endDate, setEndDate] = useState(new Date());
   const [travelId, setTravelId] = useState("");
   const [startDate, setStartDate] = useState(new Date());
+  const [isReset, setIsRest] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
+  const [fade, setFade] = useState(true);
 
   useEffect(() => {
     getTravels();
@@ -87,18 +92,36 @@ function Home() {
   const search = (e) => {
     e.preventDefault();
     if (city) {
-      const arrayFiltered2 = travels.filter((travel) =>
-        travel.localisation.includes(city)
-      );
-      setTravelsFiltered(arrayFiltered2);
-      setCity("");
+      setIsSearching(true);
+      setFade(false);
+
+      const timer = setTimeout(() => {
+        const arrayFiltered2 = travels.filter((travel) =>
+          travel.localisation.includes(city)
+        );
+        setFade(true);
+        setTravelsFiltered(arrayFiltered2);
+        setCity("");
+        setIsSearching(false);
+      }, 1000);
+
+      return () => clearTimeout(timer);
     }
   };
 
   const reset = () => {
-    setTravelsFiltered(travels);
-    getTravels();
-    setCity("");
+    setIsRest(true);
+    setFade(false);
+
+    const timer = setTimeout(() => {
+      setTravelsFiltered(travels);
+      setFade(true);
+      getTravels();
+      setCity("");
+      setIsRest(false);
+    }, 1000);
+
+    return () => clearTimeout(timer);
   };
   const sendBooking = async (e) => {
     e.preventDefault();
@@ -139,18 +162,14 @@ function Home() {
 
   return (
     <>
-      <Grid
-        container
-        alignItems="center"
-        style={{ marginTop: "70px", marginBottom: "100px" }}
-      >
+      <Grid container alignItems="center" className="homeContainer">
         <Grid container>
-          <Grid item xs={12} sm={12} md={4} lg={4}>
+          <Grid item xs={12} sm={12} md={4} lg={3}>
             <Grid
               container
               alignItems="center"
               justify="center"
-              style={{ marginTop: "70px" }}
+              className="column1"
             >
               <form noValidate autoComplete="off" onSubmit={search}>
                 <List>
@@ -164,38 +183,61 @@ function Home() {
                     />
                   </ListItem>
                   <ListItem>
-                    <Button
-                      type="submit"
-                      color="primary"
-                      variant="outlined"
-                      endIcon={<SearchIcon />}
-                    >
-                      Search
-                    </Button>
+                    {isSearching ? (
+                      <Button
+                        type="submit"
+                        color="primary"
+                        variant="outlined"
+                        endIcon={<CircularProgress size={20} />}
+                      >
+                        Search
+                      </Button>
+                    ) : (
+                      <Button
+                        type="submit"
+                        color="primary"
+                        variant="outlined"
+                        endIcon={<SearchIcon />}
+                      >
+                        Search
+                      </Button>
+                    )}
 
-                    <Button
-                      type="submit"
-                      color="primary"
-                      variant="outlined"
-                      endIcon={<RotateLeftIcon />}
-                      style={{ marginLeft: "8px" }}
-                      onClick={reset}
-                    >
-                      Reset
-                    </Button>
+                    {isReset ? (
+                      <Button
+                        color="primary"
+                        variant="outlined"
+                        endIcon={<CircularProgress size={20} />}
+                        style={{ marginLeft: "8px" }}
+                        onClick={reset}
+                      >
+                        Reset
+                      </Button>
+                    ) : (
+                      <Button
+                        type="submit"
+                        color="primary"
+                        variant="outlined"
+                        endIcon={<RotateLeftIcon />}
+                        style={{ marginLeft: "8px" }}
+                        onClick={reset}
+                      >
+                        Reset
+                      </Button>
+                    )}
                   </ListItem>
                 </List>
               </form>
             </Grid>
           </Grid>
-          <Grid item xs={12} sm={12} md={8} lg={8}>
+          <Grid item xs={12} sm={12} md={8} lg={9}>
             <Grid container alignItems="center" justify="center">
                
               {isLoading ? (
-                <h1>loading</h1>
+                ""
               ) : (
-                <Fade in={true}>
-                  <List style={{ width: "500px" }}>
+                <Fade in={fade} timeout={400}>
+                  <List className="list">
                     {travelsFiltered
                       .sort(function (a, b) {
                         return new Date(b.createdAt) - new Date(a.createdAt);
@@ -206,12 +248,7 @@ function Home() {
                         );
                         return (
                           <Paper elevation={5}>
-                            <Card
-                              style={{
-                                maxWidth: "500px",
-                                margin: "20px 0px",
-                              }}
-                            >
+                            <Card className="card">
                               <CardMedia
                                 style={{ height: 0, paddingTop: "56.25%" }}
                                 image={travel.imageUrl}
@@ -279,7 +316,12 @@ function Home() {
                                                 setTravelId(travel.uuid)
                                               }
                                             >
-                                              Booking
+                                              {travel.Bookings.find(
+                                                (booking) =>
+                                                  booking.UserUuid === UserId
+                                              )
+                                                ? "Re book"
+                                                : "Book"}
                                             </Button>
                                           )}
                                         </form>
