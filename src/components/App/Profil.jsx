@@ -14,13 +14,16 @@ import {
   Divider,
   ListItemAvatar,
   ListItemText,
+  Fade,
 } from "@material-ui/core";
 import DatePicker from "react-datepicker";
 import SendIcon from "@material-ui/icons/Send";
 import CheckIcon from "@material-ui/icons/Check";
 import CloseIcon from "@material-ui/icons/Close";
+import BlockIcon from "@material-ui/icons/Block";
 
 import { apiUrl } from "../../apiUrl";
+import "./profil.css";
 
 function Profil() {
   const [userData, setUserData] = useState([]);
@@ -28,6 +31,7 @@ function Profil() {
   const [myTravels, setMyTravels] = useState([]);
   const [bookingId, setBookingID] = useState("");
   const [bookingIdForCancel, setBookingIDForCancel] = useState("");
+  const [bookingIdForRefuse, setBookingIDForRefuse] = useState("");
 
   useEffect(() => {
     getUserData();
@@ -50,7 +54,7 @@ function Profil() {
       type="submit"
       color="primary"
       variant="outlined"
-      className="example-custom-input"
+      className="example-custom-input buttonItem"
       onClick={onClick}
     >
       {value}
@@ -78,7 +82,11 @@ function Profil() {
     e.preventDefault();
 
     try {
-      if (bookingIdForCancel) {
+      if (bookingIdForRefuse) {
+        await Axios.put(`${apiUrl}/bookings/${bookingIdForRefuse}`, {
+          accepted: "refused",
+        });
+      } else if (bookingIdForCancel) {
         await Axios.put(`${apiUrl}/bookings/${bookingIdForCancel}`, {
           accepted: "canceled",
         });
@@ -97,67 +105,71 @@ function Profil() {
   return (
     <>
       {isLoading ? (
-        <h1>coucou</h1>
+        ""
       ) : (
-        <Grid container alignItems="center" style={{ marginTop: "70px" }}>
+        <Grid container alignItems="center" className="homeContainer">
           <Grid container>
-            <Grid item xs={12} sm={12} md={4} lg={4}>
+            <Grid item xs={12} sm={12} md={4} lg={3}>
               <Grid container alignItems="center" justify="center">
                 <ListItem>
-                  <ListItemAvatar>
-                    <Avatar src={userData.avatar} aria-label="recipe" />
-                  </ListItemAvatar>
+                  <Fade in={true}>
+                    <ListItemAvatar>
+                      <Avatar
+                        src={isLoading ? "" : userData.avatar}
+                        aria-label="recipe"
+                      />
+                    </ListItemAvatar>
+                  </Fade>
                   <ListItemText primary={userData.pseudo} />
                 </ListItem>
               </Grid>
             </Grid>
 
-            <Grid item xs={12} sm={12} md={8} lg={8}>
+            <Grid item xs={12} sm={12} md={8} lg={9}>
               <Grid container alignItems="center" justify="center">
-                <List style={{ width: "500px" }}>
-                  {myTravels.map((travel) => (
-                    <Paper elevation={5}>
-                      <Card
-                        style={{
-                          maxWidth: "500px",
-                          margin: "20px 0px",
-                        }}
-                      >
-                        <CardMedia
-                          style={{ height: 0, paddingTop: "56.25%" }}
-                          image={travel.imageUrl}
-                          title={travel.pseudo}
-                        />
-                        <CardContent>
-                          <Typography gutterBottom>{travel.title}</Typography>
-                        </CardContent>
-                        <CardContent>
-                          {travel.Bookings.length === 0 ? (
-                            <Button color="primary" variant="outlined">
-                              You don't have bookings yet
-                            </Button>
-                          ) : (
-                            <Typography variant="h5" gutterBottom>
-                              Bookings
-                            </Typography>
-                          )}
-                        </CardContent>
-                        <Divider />
-                        {travel.Bookings.map((booking) => (
-                          <>
-                            <CardContent>
-                              <List>
-                                <ListItem style={{ width: " max-content" }}>
-                                  <ListItemAvatar>
-                                    <Avatar
-                                      src={booking.User.avatar}
-                                      aria-label="recipe"
-                                    />
-                                  </ListItemAvatar>
-                                  <ListItemText primary={booking.User.pseudo} />
-                                </ListItem>
-                                <ListItem>
-                                  <CardContent style={{ padding: "2px" }}>
+                <List className="list">
+                  {myTravels
+                    .sort(function (a, b) {
+                      return new Date(b.createdAt) - new Date(a.createdAt);
+                    })
+                    .map((travel) => (
+                      <Paper elevation={5}>
+                        <Card
+                          style={{
+                            maxWidth: "500px",
+                            margin: "20px 0px",
+                          }}
+                        >
+                          <CardMedia
+                            style={{ height: 0, paddingTop: "56.25%" }}
+                            image={travel.imageUrl}
+                            title={travel.pseudo}
+                          />
+                          <CardContent>
+                            <Typography gutterBottom>{travel.title}</Typography>
+                          </CardContent>
+                          <Divider />
+                          <CardContent>
+                            {travel.Bookings.length === 0 ? (
+                              <Button color="primary" variant="outlined">
+                                You don't have bookings yet
+                              </Button>
+                            ) : (
+                              <Typography variant="h5" gutterBottom>
+                                Bookings
+                              </Typography>
+                            )}
+                          </CardContent>
+                          <Divider />
+                          {travel.Bookings.sort(function (a, b) {
+                            return (
+                              new Date(b.createdAt) - new Date(a.createdAt)
+                            );
+                          }).map((booking) => (
+                            <>
+                              <CardContent>
+                                <List>
+                                  <ListItem style={{ width: " max-content" }}>
                                     <DatePicker
                                       selected={new Date(booking.startDate)}
                                       // onChange={(date) => setStartDate(date)}
@@ -166,8 +178,7 @@ function Profil() {
                                       popperPlacement="auto-left"
                                       customInput={<ExampleCustomInput />}
                                     />
-                                  </CardContent>
-                                  <CardContent style={{ padding: "2px" }}>
+
                                     <DatePicker
                                       selected={new Date(booking.endDate)}
                                       // onChange={(date) => setEndDate(date)}
@@ -175,8 +186,20 @@ function Profil() {
                                       placeholderText="Select a date other than today or yesterday"
                                       customInput={<ExampleCustomInput />}
                                     />
-                                  </CardContent>
-                                  <CardContent style={{ padding: "2px" }}>
+
+                                    <ListItemAvatar
+                                      style={{ marginLeft: "5px" }}
+                                    >
+                                      <Avatar
+                                        src={booking.User.avatar}
+                                        aria-label="recipe"
+                                      />
+                                    </ListItemAvatar>
+                                    <ListItemText
+                                      primary={booking.User.pseudo}
+                                    />
+                                  </ListItem>
+                                  <ListItem>
                                     <form onSubmit={changeBooking}>
                                       {booking.accepted === "confirmed" ? (
                                         <>
@@ -187,6 +210,7 @@ function Profil() {
                                             }}
                                             variant="contained"
                                             endIcon={<CheckIcon />}
+                                            className="buttonItem"
                                           >
                                             You Confirmed
                                           </Button>
@@ -206,40 +230,69 @@ function Profil() {
                                           </Button>
                                         </>
                                       ) : booking.accepted === "waiting" ? (
+                                        <>
+                                          <Button
+                                            type="submit"
+                                            color="primary"
+                                            variant="contained"
+                                            className="buttonItem"
+                                            endIcon={<SendIcon />}
+                                            onClick={(e) =>
+                                              setBookingID(booking.uuid)
+                                            }
+                                          >
+                                            Accept
+                                          </Button>
+                                          <Button
+                                            type="submit"
+                                            style={{
+                                              backgroundColor: "#ef6c00",
+                                            }}
+                                            variant="contained"
+                                            endIcon={<BlockIcon />}
+                                            onClick={(e) =>
+                                              setBookingIDForRefuse(
+                                                booking.uuid
+                                              )
+                                            }
+                                          >
+                                            Refuse
+                                          </Button>
+                                        </>
+                                      ) : booking.accepted === "refused" ? (
                                         <Button
-                                          type="submit"
-                                          color="primary"
+                                          style={{
+                                            backgroundColor: "#ef6c00",
+                                          }}
                                           variant="contained"
-                                          endIcon={<SendIcon />}
-                                          onClick={(e) =>
-                                            setBookingID(booking.uuid)
-                                          }
+                                          endIcon={<BlockIcon />}
+                                          className="buttonItem"
                                         >
-                                          Accept
+                                          You refuse
                                         </Button>
                                       ) : (
                                         <Button
                                           style={{
-                                            backgroundColor: "#e91e63",
+                                            backgroundColor: "#757575",
                                           }}
                                           variant="contained"
                                           endIcon={<CloseIcon />}
+                                          className="buttonItem"
                                         >
                                           Canceled
                                         </Button>
                                       )}
                                     </form>
-                                  </CardContent>
-                                </ListItem>
-                              </List>
-                            </CardContent>
+                                  </ListItem>
+                                </List>
+                              </CardContent>
 
-                            <Divider />
-                          </>
-                        ))}
-                      </Card>
-                    </Paper>
-                  ))}
+                              <Divider />
+                            </>
+                          ))}
+                        </Card>
+                      </Paper>
+                    ))}
                 </List>
               </Grid>
             </Grid>
