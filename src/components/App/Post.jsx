@@ -12,10 +12,12 @@ import {
   DialogActions,
   Paper,
   CardMedia,
+  CircularProgress,
 } from "@material-ui/core";
 import Axios from "axios";
 import { apiUrl } from "../../apiUrl";
 import PhotoIcon from "@material-ui/icons/Photo";
+import CheckIcon from "@material-ui/icons/Check";
 
 const Post = () => {
   const [title, setTitle] = useState("");
@@ -23,6 +25,8 @@ const Post = () => {
   const [imageCard, setImageCard] = useState("");
   const [localisation, setLocalisation] = useState("");
   const [description, setDescrition] = useState("");
+  const [postLoading, setPostLoading] = useState(false);
+  const [postSuccess, setPostSuccess] = useState(false);
 
   const [open, setOpen] = useState(false);
 
@@ -43,9 +47,10 @@ const Post = () => {
 
   const sendPost = async (e) => {
     e.preventDefault();
+    setPostLoading(true);
 
     try {
-      if (photo) {
+      if (photo && title && localisation && description) {
         const imgurToken = "44670bbff769f1a";
         const UserId = window.localStorage.getItem("uuid");
 
@@ -62,7 +67,23 @@ const Post = () => {
           title,
         });
       }
-      setOpen(false);
+
+      const timer = setTimeout(() => {
+        setPostLoading(false);
+      }, 1000);
+      setPostSuccess(true);
+
+      const timer3 = setTimeout(() => {
+        setOpen(false);
+        setTitle("");
+        setPhoto("");
+        setImageCard("");
+        setLocalisation("");
+        setDescrition("");
+        setPostSuccess(false);
+      }, 3000);
+
+      return () => clearTimeout(timer3, timer);
     } catch (err) {
       console.log(err);
     }
@@ -70,8 +91,8 @@ const Post = () => {
 
   return (
     <>
-      <Grid container>
-        <Grid item lg={6} style={{ marginTop: "200px" }}>
+      <Grid container justify="center">
+        <Grid item lg={6} style={{ marginTop: "150px" }}>
           <Grid container justify="center">
             <List>
               <ListItem>
@@ -130,17 +151,16 @@ const Post = () => {
                     <PhotoIcon />
                   </Button>
                 </label>
-              </ListItem>
-              <ListItem>
                 <Button
                   color="primary"
                   variant="contained"
                   onClick={handleClickOpen}
-                  // disabled={!title || !localisation || !description || !photo}
+                  style={{marginLeft: "15px"}}
                 >
                   Preview
                 </Button>
               </ListItem>
+             
             </List>
 
             <Dialog
@@ -167,15 +187,47 @@ const Post = () => {
                   />
                 </Paper>
               </DialogContent>
-              <DialogActions>
-                <Button
-                  autoFocus
-                  onClick={sendPost}
-                  variant="contained"
-                  color="primary"
-                >
-                  Post
-                </Button>
+              <DialogActions style={{ alignSelf: "center" }}>
+                {postLoading ? (
+                  <Button
+                    style={{
+                      width: "85px",
+                      height: "35px",
+                    }}
+                    autoFocus
+                    variant="contained"
+                    color="primary"
+                    disabled={postLoading}
+                  >
+                    <CircularProgress size={23} />
+                  </Button>
+                ) : postSuccess ? (
+                  <Button
+                    style={{
+                      backgroundColor: "#4caf50",
+                      width: "85px",
+                      height: "35px",
+                    }}
+                    variant="contained"
+                    endIcon={<CheckIcon />}
+                  >
+                    Done
+                  </Button>
+                ) : (
+                  <Button
+                    style={{
+                      width: "85px",
+                      height: "35px",
+                    }}
+                    autoFocus
+                    onClick={sendPost}
+                    variant="contained"
+                    color="primary"
+                    disabled={postLoading}
+                  >
+                    Post
+                  </Button>
+                )}
               </DialogActions>
             </Dialog>
           </Grid>
