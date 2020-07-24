@@ -2,6 +2,7 @@
   .appBar {
     top: unset !important;
     bottom: 0 !important;
+    padding: 10px 0px;
   }
   .appLinks {
     margin: auto !important;

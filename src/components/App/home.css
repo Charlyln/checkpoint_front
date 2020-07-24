@@ -1,0 +1,37 @@
+/* Smartphone */
+
+@media screen and (max-width: 640px) {
+  .homeContainer {
+    margin-top: 10px !important;
+    margin-bottom: 100px !important;
+  }
+  .column1 {
+    margin-top: 10px !important;
+  }
+  .list {
+    width: 99% !important;
+  }
+  .card {
+    
+    margin: 20px 0px !important;
+  }
+}
+
+/* PC */
+
+@media screen and (min-width: 640px) {
+  .homeContainer {
+    margin-top: 60px !important;
+    margin-bottom: 50px !important;
+  }
+  .column1 {
+    margin-top: 70px !important;
+  }
+  .list {
+    width: 500px !important;
+  }
+  .card {
+    width: 500px !important;
+    margin: 20px 0px !important;
+  }
+}
