@@ -114,13 +114,13 @@ function Favorites() {
 
   return (
     <>
-      <Grid container alignItems="center" style={{ marginTop: "70px" }}>
+      <Grid container alignItems="center" className="homeContainer">
         <Grid container>
-          <Grid item xs={12} sm={12} md={8} lg={8}>
+          <Grid item xs={12} sm={12} md={12} lg={12}>
             <Grid container alignItems="center" justify="center">
                
               {isLoading ? (
-                <h1>loading</h1>
+                ""
               ) : (
                 <Fade in={true}>
                   <List style={{ width: "500px" }}>
@@ -202,7 +202,12 @@ function Favorites() {
                                             setTravelId(travel.uuid)
                                           }
                                         >
-                                          Booking
+                                          {travel.Bookings.find(
+                                            (booking) =>
+                                              booking.UserUuid === UserId
+                                          )
+                                            ? "Re book"
+                                            : "Book"}
                                         </Button>
                                       )}
                                     </form>
@@ -215,7 +220,19 @@ function Favorites() {
                               disableSpacing
                               style={{ marginLeft: "5px" }}
                             >
+                              <ListItem>
+                                <ListItemAvatar>
+                                  <Avatar
+                                    src={travel.User.avatar}
+                                    aria-label="recipe"
+                                  />
+                                </ListItemAvatar>
+                                <ListItemText
+                                  primary={`Post by ${travel.User.pseudo}`}
+                                />
+                              </ListItem>
                               <FormControlLabel
+                                style={{ marginLeft: "auto" }}
                                 control={
                                   <Checkbox
                                     icon={<FavoriteBorder />}
@@ -232,17 +249,6 @@ function Favorites() {
                                   />
                                 }
                               />
-                              <ListItem style={{ marginLeft: "50%" }}>
-                                <ListItemAvatar>
-                                  <Avatar
-                                    src={travel.User.avatar}
-                                    aria-label="recipe"
-                                  />
-                                </ListItemAvatar>
-                                <ListItemText
-                                  primary={`Post by ${travel.User.pseudo}`}
-                                />
-                              </ListItem>
                             </CardActions>
                           </Card>
                         </Paper>
