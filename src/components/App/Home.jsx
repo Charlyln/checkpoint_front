@@ -30,7 +30,6 @@ import RotateLeftIcon from "@material-ui/icons/RotateLeft";
 import SearchIcon from "@material-ui/icons/Search";
 import CheckIcon from "@material-ui/icons/Check";
 
-
 import "./home.css";
 
 function Home() {
@@ -86,7 +85,10 @@ function Home() {
       setTravels(res.data);
       setTravelsFiltered(res.data);
       setUserId(window.localStorage.getItem("uuid"));
-      setIsLoading(false);
+      const timer = setTimeout(() => {
+        setIsLoading(false);
+      }, 1000);
+      return () => clearTimeout(timer);
     } catch (err) {
       console.log(err);
     }
@@ -95,6 +97,7 @@ function Home() {
     e.preventDefault();
     if (city) {
       setIsSearching(true);
+      setIsLoading(true);
       setFade(false);
 
       const timer = setTimeout(() => {
@@ -105,6 +108,7 @@ function Home() {
         setTravelsFiltered(arrayFiltered2);
         setCity("");
         setIsSearching(false);
+        setIsLoading(false);
       }, 1000);
 
       return () => clearTimeout(timer);
@@ -157,11 +161,6 @@ function Home() {
     </Button>
   );
 
-  // const isWeekday = () => {
-  //   const day = new Date();
-  //   return day !== 0 && day !== 6;
-  // };
-
   return (
     <>
       <Grid container alignItems="center" className="homeContainer">
@@ -185,7 +184,7 @@ function Home() {
                     />
                   </ListItem>
                   <ListItem>
-                    {isSearching ? (
+                    {isSearching || isLoading ? (
                       <Button
                         type="submit"
                         color="primary"

@@ -295,7 +295,19 @@ function Booking() {
                                 ))}
 
                               <CardActions disableSpacing>
+                                <ListItem>
+                                  <ListItemAvatar>
+                                    <Avatar
+                                      src={travel.User.avatar}
+                                      aria-label="recipe"
+                                    />
+                                  </ListItemAvatar>
+                                  <ListItemText
+                                    primary={`Post by ${travel.User.pseudo}`}
+                                  />
+                                </ListItem>
                                 <FormControlLabel
+                                  style={{ marginLeft: "auto" }}
                                   control={
                                     <Checkbox
                                       icon={<FavoriteBorder />}
@@ -312,17 +324,6 @@ function Booking() {
                                     />
                                   }
                                 />
-                                <ListItem style={{ marginLeft: "50%" }}>
-                                  <ListItemAvatar>
-                                    <Avatar
-                                      src={travel.User.avatar}
-                                      aria-label="recipe"
-                                    />
-                                  </ListItemAvatar>
-                                  <ListItemText
-                                    primary={`Post by ${travel.User.pseudo}`}
-                                  />
-                                </ListItem>
                               </CardActions>
                             </Card>
                           </Paper>
