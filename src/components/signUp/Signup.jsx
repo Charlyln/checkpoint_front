@@ -1,16 +1,19 @@
 import React, { useState } from "react";
 import Grid from "@material-ui/core/Grid";
 import Axios from "axios";
-import { TextField, Avatar, Button } from "@material-ui/core";
+import { TextField, Avatar, Button, CircularProgress } from "@material-ui/core";
 import PersonIcon from "@material-ui/icons/Person";
 import { Redirect } from "react-router-dom";
+import CheckIcon from "@material-ui/icons/Check";
 
 import { apiUrl } from "../../apiUrl";
 
 function SignUp() {
   const [pseudo, setPseudo] = useState("");
   const [logo, setLogo] = useState("");
-  const [isLoading, setisLoading] = useState(false);
+  const [postLoading, setPostLoading] = useState(false);
+  const [postSuccess, setPostSuccess] = useState(false);
+  const [redirect, setRedirect] = useState(window.localStorage.getItem("uuid"));
 
   const getRandomAvatar = () => {
     Axios.get(`https://randomuser.me/api`).then((res) =>
@@ -18,8 +21,9 @@ function SignUp() {
     );
   };
 
-  const Signup = async (e) => {
+  const SignupPost = async (e) => {
     e.preventDefault();
+    setPostLoading(true);
     try {
       if (logo && pseudo) {
         const res = await Axios.post(`${apiUrl}/users`, {
@@ -27,14 +31,24 @@ function SignUp() {
           avatar: logo,
         });
         window.localStorage.setItem("uuid", res.data.uuid);
-        setisLoading(true);
+        const timer = setTimeout(() => {
+          setPostLoading(false);
+        }, 1000);
+        setPostSuccess(true);
+
+        const timer3 = setTimeout(() => {
+          setPostSuccess(false);
+          setRedirect(true);
+        }, 3000);
+
+        return () => clearTimeout(timer3, timer);
       }
     } catch (err) {
       console.log(err);
     }
   };
 
-  if (window.localStorage.getItem("uuid")) {
+  if (redirect) {
     return <Redirect to="/home" />;
   }
 
@@ -43,7 +57,6 @@ function SignUp() {
       <Grid container>
         <Grid item xs={12} style={{ marginTop: "130px" }}>
           <Grid container justify="center">
-            {isLoading ? "" : ""}
             {/* <input
               accept="image/*"
               style={{ display: "none" }}
@@ -95,7 +108,7 @@ function SignUp() {
             </Grid>
             <Grid item xs={12} style={{ marginTop: "50px" }}>
               <Grid container alignItems="center" justify="center">
-                <Button
+                {/* <Button
                   type="submit"
                   variant="contained"
                   color="primary"
@@ -103,7 +116,47 @@ function SignUp() {
                   onClick={Signup}
                 >
                   Signup
-                </Button>
+                </Button> */}
+
+                {postLoading ? (
+                  <Button
+                    style={{
+                      width: "85px",
+                      height: "35px",
+                    }}
+                    variant="contained"
+                    color="primary"
+                    disabled={postLoading}
+                  >
+                    <CircularProgress size={23} />
+                  </Button>
+                ) : postSuccess ? (
+                  <Button
+                    style={{
+                      backgroundColor: "#4caf50",
+                      width: "85px",
+                      height: "35px",
+                    }}
+                    variant="contained"
+                    endIcon={<CheckIcon />}
+                  >
+                    Done
+                  </Button>
+                ) : (
+                  <Button
+                    type="submit"
+                    style={{
+                      width: "85px",
+                      height: "35px",
+                    }}
+                    onClick={SignupPost}
+                    variant="contained"
+                    color="primary"
+                    disabled={postLoading}
+                  >
+                    Signup
+                  </Button>
+                )}
               </Grid>
             </Grid>
           </Grid>
