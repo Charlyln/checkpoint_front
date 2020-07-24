@@ -7,7 +7,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import HourglassEmptyIcon from "@material-ui/icons/HourglassEmpty";
 import CheckIcon from "@material-ui/icons/Check";
-
+import BlockIcon from "@material-ui/icons/Block";
 import {
   Button,
   Avatar,
@@ -104,63 +104,31 @@ function Booking() {
       console.log(err);
     }
   };
-  // const search = (e) => {
-  //   e.preventDefault();
-
-  //   const arrayFiltered2 = travels.filter(
-  //     (travel) => travel.localisation === city
-  //   );
-  //   setTravelsFiltered(arrayFiltered2);
-  // };
-
-  // const sendBooking = async (e) => {
-  //   e.preventDefault();
-
-  //   try {
-  //     if (startDate && endDate) {
-  //       const UserUuid = window.localStorage.getItem("uuid");
-
-  //       const res = await Axios.post(`${apiUrl}/bookings`, {
-  //         TravelUuid: travelId,
-  //         UserUuid,
-  //         startDate,
-  //         endDate,
-  //       });
-  //     }
-  //   } catch (err) {
-  //     console.log(err);
-  //   }
-  // };
 
   const ExampleCustomInput = ({ value, onClick }) => (
     <Button
       type="submit"
       color="primary"
       variant="outlined"
-      className="example-custom-input"
+      className="example-custom-input buttonItem"
       onClick={onClick}
     >
       {value}
     </Button>
   );
 
-  // const isWeekday = () => {
-  //   const day = new Date();
-  //   return day !== 0 && day !== 6;
-  // };
-
   return (
     <>
-      <Grid container alignItems="center" style={{ marginTop: "70px" }}>
+      <Grid container alignItems="center" className="homeContainer">
         <Grid container>
-          <Grid item xs={12} sm={12} md={8} lg={8}>
+          <Grid item xs={12} sm={12} md={12} lg={12}>
             <Grid container alignItems="center" justify="center">
                {travels ? "" : ""}
               {isLoading ? (
-                <h1>loading</h1>
+                ""
               ) : (
                 <Fade in={true}>
-                  <List style={{ width: "500px" }}>
+                  <List className="list">
                     {travelsFiltered
                       .sort(function (a, b) {
                         return new Date(b.createdAt) - new Date(a.createdAt);
@@ -198,33 +166,33 @@ function Booking() {
                               <CardContent>
                                 <Typography>{travel.localisation}</Typography>
                               </CardContent>
+                              <Divider />
+                              <CardContent>
+                                <Typography variant="h5" gutterBottom>
+                                  My Books
+                                </Typography>
+                              </CardContent>
+                              <Divider />
 
                               {travel.Bookings.filter(
                                 (booking) => booking.UserUuid === UserId
-                              ).map((booking) => (
-                                <>
-                                  <CardContent>
-                                    <List>
-                                      <ListItem
-                                        style={{ width: " max-content" }}
-                                      >
-                                        <ListItemAvatar>
-                                          <Avatar
-                                            src={booking.User.avatar}
-                                            aria-label="recipe"
-                                          />
-                                        </ListItemAvatar>
-                                        <ListItemText
-                                          primary={booking.User.pseudo}
-                                        />
-                                      </ListItem>
-                                      <ListItem>
-                                        <CardContent style={{ padding: "2px" }}>
+                              )
+                                .sort(function (a, b) {
+                                  return (
+                                    new Date(b.createdAt) -
+                                    new Date(a.createdAt)
+                                  );
+                                })
+                                .map((booking) => (
+                                  <>
+                                    <CardContent>
+                                      <List>
+                                        <ListItem
+                                          style={{ width: " max-content" }}
+                                        >
                                           <DatePicker
                                             selected={
-                                              new Date(
-                                                travel.Bookings[0].startDate
-                                              )
+                                              new Date(booking.startDate)
                                             }
                                             // onChange={(date) => setStartDate(date)}
                                             // excludeDates={dates}
@@ -232,21 +200,26 @@ function Booking() {
                                             popperPlacement="auto-left"
                                             customInput={<ExampleCustomInput />}
                                           />
-                                        </CardContent>
-                                        <CardContent style={{ padding: "2px" }}>
                                           <DatePicker
-                                            selected={
-                                              new Date(
-                                                travel.Bookings[0].endDate
-                                              )
-                                            }
+                                            selected={new Date(booking.endDate)}
                                             // onChange={(date) => setEndDate(date)}
                                             // excludeDates={[new Date()]}
                                             placeholderText="Select a date other than today or yesterday"
                                             customInput={<ExampleCustomInput />}
                                           />
-                                        </CardContent>
-                                        <CardContent style={{ padding: "2px" }}>
+                                          <ListItemAvatar
+                                            style={{ marginLeft: "5px" }}
+                                          >
+                                            <Avatar
+                                              src={booking.User.avatar}
+                                              aria-label="recipe"
+                                            />
+                                          </ListItemAvatar>
+                                          <ListItemText
+                                            primary={booking.User.pseudo}
+                                          />
+                                        </ListItem>
+                                        <ListItem>
                                           <form onSubmit={changeBooking}>
                                             {booking.accepted ===
                                             "confirmed" ? (
@@ -257,6 +230,7 @@ function Booking() {
                                                   }}
                                                   variant="contained"
                                                   endIcon={<CheckIcon />}
+                                                  className="buttonItem"
                                                 >
                                                   Confirmed
                                                 </Button>
@@ -283,80 +257,42 @@ function Booking() {
                                                 }}
                                                 variant="contained"
                                                 endIcon={<HourglassEmptyIcon />}
+                                                className="buttonItem"
                                               >
                                                 Waiting
+                                              </Button>
+                                            ) : booking.accepted ===
+                                              "refused" ? (
+                                              <Button
+                                                style={{
+                                                  backgroundColor: "#ef6c00",
+                                                }}
+                                                variant="contained"
+                                                endIcon={<BlockIcon />}
+                                                className="buttonItem"
+                                              >
+                                                Refused
                                               </Button>
                                             ) : (
                                               <Button
                                                 style={{
-                                                  backgroundColor: "#e91e63",
+                                                  backgroundColor: "#757575",
                                                 }}
                                                 variant="contained"
                                                 endIcon={<CloseIcon />}
+                                                className="buttonItem"
                                               >
                                                 Canceled
                                               </Button>
                                             )}
                                           </form>
-                                        </CardContent>
-                                      </ListItem>
-                                    </List>
-                                  </CardContent>
+                                        </ListItem>
+                                      </List>
+                                    </CardContent>
 
-                                  <Divider />
-                                </>
-                              ))}
-
-                              {/* <CardContent>
-                                <List>
-                                  <ListItem>
-                                    <CardContent style={{ padding: "2px" }}>
-                                      <DatePicker
-                                        selected={
-                                          new Date(travel.Bookings[0].startDate)
-                                        }
-                                        onChange={(date) => setStartDate(date)}
-                                        excludeDates={dates}
-                                        placeholderText="Select a date other than today or yesterday"
-                                        popperPlacement="auto-left"
-                                        customInput={<ExampleCustomInput />}
-                                      />
-                                    </CardContent>
-                                    <CardContent style={{ padding: "2px" }}>
-                                      <DatePicker
-                                        selected={
-                                          new Date(travel.Bookings[0].endDate)
-                                        }
-                                        onChange={(date) => setEndDate(date)}
-                                        excludeDates={[new Date()]}
-                                        placeholderText="Select a date other than today or yesterday"
-                                        customInput={<ExampleCustomInput />}
-                                      />
-                                    </CardContent>
-                                    <CardContent style={{ padding: "2px" }}>
-                                      {travel.Bookings[0].accepted ? (
-                                        <Button
-                                          type="submit"
-                                          style={{ backgroundColor: "#4caf50" }}
-                                          variant="contained"
-                                          endIcon={<CheckIcon />}
-                                        >
-                                          Confirmed
-                                        </Button>
-                                      ) : (
-                                        <Button
-                                          type="submit"
-                                          style={{ backgroundColor: "#ffc400" }}
-                                          variant="contained"
-                                          endIcon={<HourglassEmptyIcon />}
-                                        >
-                                          Waiting
-                                        </Button>
-                                      )}
-                                    </CardContent>
-                                  </ListItem>
-                                </List>
-                              </CardContent> */}
+                                    <Divider />
+                                  </>
+                                ))}
 
                               <CardActions disableSpacing>
                                 <FormControlLabel
