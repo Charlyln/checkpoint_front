@@ -25,6 +25,8 @@ import {
 } from "@material-ui/core";
 import Favorite from "@material-ui/icons/Favorite";
 import FavoriteBorder from "@material-ui/icons/FavoriteBorder";
+import CheckIcon from "@material-ui/icons/Check";
+
 
 function Favorites() {
   const [travels, setTravels] = useState([]);
@@ -117,13 +119,13 @@ function Favorites() {
       <Grid container alignItems="center" className="homeContainer">
         <Grid container>
           <Grid item xs={12} sm={12} md={12} lg={12}>
-            <Grid container alignItems="center" justify="center">
+            <Grid container alignItems="center" justify="center" >
                
               {isLoading ? (
                 ""
               ) : (
                 <Fade in={true}>
-                  <List style={{ width: "500px" }}>
+                  <List className="list">
                     {travels
                       .filter((message) =>
                         message.Likes.find(
@@ -190,8 +192,9 @@ function Favorites() {
                                             backgroundColor: "#4caf50",
                                           }}
                                           variant="contained"
+                                          endIcon={<CheckIcon />}
                                         >
-                                          Booking sent
+                                          Sent
                                         </Button>
                                       ) : (
                                         <Button

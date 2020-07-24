@@ -28,6 +28,8 @@ import Favorite from "@material-ui/icons/Favorite";
 import FavoriteBorder from "@material-ui/icons/FavoriteBorder";
 import RotateLeftIcon from "@material-ui/icons/RotateLeft";
 import SearchIcon from "@material-ui/icons/Search";
+import CheckIcon from "@material-ui/icons/Check";
+
 
 import "./home.css";
 
@@ -304,8 +306,9 @@ function Home() {
                                                 backgroundColor: "#4caf50",
                                               }}
                                               variant="contained"
+                                              endIcon={<CheckIcon />}
                                             >
-                                              Booking sent
+                                              Sent
                                             </Button>
                                           ) : (
                                             <Button

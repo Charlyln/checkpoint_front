@@ -100,6 +100,9 @@ function Profil() {
     }
     getMyTravels();
     getUserData();
+    setBookingID("");
+    setBookingIDForCancel("");
+    setBookingIDForRefuse("");
   };
 
   return (
