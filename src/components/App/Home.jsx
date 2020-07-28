@@ -45,6 +45,7 @@ function Home() {
   const [isReset, setIsRest] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const [fade, setFade] = useState(true);
+  const [citySearch, setCitySearch] = useState("");
 
   useEffect(() => {
     getTravels();
@@ -102,8 +103,9 @@ function Home() {
 
       const timer = setTimeout(() => {
         const arrayFiltered2 = travels.filter((travel) =>
-          travel.localisation.includes(city)
+          travel.localisation.toLowerCase().includes(city.toLowerCase())
         );
+        setCitySearch(city);
         setFade(true);
         setTravelsFiltered(arrayFiltered2);
         setCity("");
@@ -123,6 +125,7 @@ function Home() {
       setTravelsFiltered(travels);
       setFade(true);
       getTravels();
+      setCitySearch("");
       setCity("");
       setIsRest(false);
     }, 1000);
@@ -242,6 +245,15 @@ function Home() {
                     {travelsFiltered
                       .sort(function (a, b) {
                         return new Date(b.createdAt) - new Date(a.createdAt);
+                      })
+                      .filter((travel) => {
+                        if (citySearch) {
+                          return travel.localisation
+                            .toLowerCase()
+                            .includes(citySearch.toLowerCase());
+                        } else {
+                          return travel;
+                        }
                       })
                       .map((travel) => {
                         const dates = travel.Bookings.map(
