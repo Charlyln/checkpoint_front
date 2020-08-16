@@ -26,6 +26,8 @@ import {
 import Favorite from "@material-ui/icons/Favorite";
 import FavoriteBorder from "@material-ui/icons/FavoriteBorder";
 import CheckIcon from "@material-ui/icons/Check";
+import MyAppBar from "../signUp/appBar/MyAppBar";
+import { Redirect } from "react-router-dom";
 
 
 function Favorites() {
@@ -114,8 +116,14 @@ function Favorites() {
     </Button>
   );
 
+  if (!window.localStorage.getItem("uuid")) {
+    return <Redirect to="/" />;
+  }
+
   return (
     <>
+         <MyAppBar />
+
       <Grid container alignItems="center" className="homeContainer">
         <Grid container>
           <Grid item xs={12} sm={12} md={12} lg={12}>

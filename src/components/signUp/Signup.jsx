@@ -1,61 +1,71 @@
-import React, { useState } from "react";
-import Grid from "@material-ui/core/Grid";
-import Axios from "axios";
-import { TextField, Avatar, Button, CircularProgress } from "@material-ui/core";
-import PersonIcon from "@material-ui/icons/Person";
-import { Redirect } from "react-router-dom";
-import CheckIcon from "@material-ui/icons/Check";
+import React, { useState } from 'react'
+import Grid from '@material-ui/core/Grid'
+import Axios from 'axios'
+import {
+  TextField,
+  Avatar,
+  Button,
+  CircularProgress,
+  AppBar,
+  Toolbar
+} from '@material-ui/core'
+import PersonIcon from '@material-ui/icons/Person'
+import { Redirect } from 'react-router-dom'
+import CheckIcon from '@material-ui/icons/Check'
 
-import { apiUrl } from "../../apiUrl";
+import { apiUrl } from '../../apiUrl'
 
 function SignUp() {
-  const [pseudo, setPseudo] = useState("");
-  const [logo, setLogo] = useState("");
-  const [postLoading, setPostLoading] = useState(false);
-  const [postSuccess, setPostSuccess] = useState(false);
-  const [redirect, setRedirect] = useState(window.localStorage.getItem("uuid"));
+  const [pseudo, setPseudo] = useState('')
+  const [logo, setLogo] = useState('')
+  const [postLoading, setPostLoading] = useState(false)
+  const [postSuccess, setPostSuccess] = useState(false)
+  const [redirect, setRedirect] = useState(window.localStorage.getItem('uuid'))
 
   const getRandomAvatar = () => {
     Axios.get(`https://randomuser.me/api`).then((res) =>
       setLogo(res.data.results[0].picture.large)
-    );
-  };
+    )
+  }
 
   const SignupPost = async (e) => {
-    e.preventDefault();
-    setPostLoading(true);
+    e.preventDefault()
+    setPostLoading(true)
     try {
       if (logo && pseudo) {
         const res = await Axios.post(`${apiUrl}/users`, {
           pseudo,
-          avatar: logo,
-        });
-        window.localStorage.setItem("uuid", res.data.uuid);
+          avatar: logo
+        })
+        window.localStorage.setItem('uuid', res.data.uuid)
         const timer = setTimeout(() => {
-          setPostLoading(false);
-        }, 1000);
-        setPostSuccess(true);
+          setPostLoading(false)
+        }, 1000)
+        setPostSuccess(true)
 
         const timer3 = setTimeout(() => {
-          setPostSuccess(false);
-          setRedirect(true);
-        }, 3000);
+          setPostSuccess(false)
+          setRedirect(true)
+        }, 3000)
 
-        return () => clearTimeout(timer3, timer);
+        return () => clearTimeout(timer3, timer)
       }
     } catch (err) {
-      console.log(err);
+      console.log(err)
     }
-  };
+  }
 
   if (redirect) {
-    return <Redirect to="/home" />;
+    return <Redirect to="/home" />
   }
 
   return (
     <>
+      <AppBar className="appBar">
+        <Toolbar style={{ width: '100%', padding: 0 }}></Toolbar>
+      </AppBar>
       <Grid container>
-        <Grid item xs={12} style={{ marginTop: "130px" }}>
+        <Grid item xs={12} style={{ marginTop: '130px' }}>
           <Grid container justify="center">
             {/* <input
               accept="image/*"
@@ -87,18 +97,18 @@ function SignUp() {
             </Button>
           </Grid>
         </Grid>
-        <Grid item xs={12} style={{ marginTop: "50px" }}>
+        <Grid item xs={12} style={{ marginTop: '50px' }}>
           <Grid container alignItems="center" justify="center">
             <Avatar
               alt="Temy Sharp"
               src={logo}
-              style={{ width: "70px", height: "70px" }}
+              style={{ width: '70px', height: '70px' }}
             />
           </Grid>
-          <Grid item xs={12} style={{ marginTop: "50px" }}>
+          <Grid item xs={12} style={{ marginTop: '50px' }}>
             <Grid container alignItems="center" justify="center">
               <TextField
-                style={{ margin: "20px" }}
+                style={{ margin: '20px' }}
                 id="message"
                 label="Pseudo"
                 variant="outlined"
@@ -106,7 +116,7 @@ function SignUp() {
                 onChange={(e) => setPseudo(e.target.value)}
               />
             </Grid>
-            <Grid item xs={12} style={{ marginTop: "50px" }}>
+            <Grid item xs={12} style={{ marginTop: '50px' }}>
               <Grid container alignItems="center" justify="center">
                 {/* <Button
                   type="submit"
@@ -121,8 +131,8 @@ function SignUp() {
                 {postLoading ? (
                   <Button
                     style={{
-                      width: "85px",
-                      height: "35px",
+                      width: '85px',
+                      height: '35px'
                     }}
                     variant="contained"
                     color="primary"
@@ -133,9 +143,9 @@ function SignUp() {
                 ) : postSuccess ? (
                   <Button
                     style={{
-                      backgroundColor: "#4caf50",
-                      width: "85px",
-                      height: "35px",
+                      backgroundColor: '#4caf50',
+                      width: '85px',
+                      height: '35px'
                     }}
                     variant="contained"
                     endIcon={<CheckIcon />}
@@ -146,8 +156,8 @@ function SignUp() {
                   <Button
                     type="submit"
                     style={{
-                      width: "85px",
-                      height: "35px",
+                      width: '85px',
+                      height: '35px'
                     }}
                     onClick={SignupPost}
                     variant="contained"
@@ -163,7 +173,7 @@ function SignUp() {
         </Grid>
       </Grid>
     </>
-  );
+  )
 }
 
-export default SignUp;
+export default SignUp

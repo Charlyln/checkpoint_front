@@ -31,6 +31,8 @@ import SearchIcon from "@material-ui/icons/Search";
 import CheckIcon from "@material-ui/icons/Check";
 
 import "./home.css";
+import MyAppBar from "../signUp/appBar/MyAppBar";
+import { Redirect } from "react-router-dom";
 
 function Home() {
   const [travels, setTravels] = useState([]);
@@ -164,8 +166,14 @@ function Home() {
     </Button>
   );
 
+  if (!window.localStorage.getItem("uuid")) {
+    return <Redirect to="/" />;
+  }
+
   return (
     <>
+         <MyAppBar />
+
       <Grid container alignItems="center" className="homeContainer">
         <Grid container>
           <Grid item xs={12} sm={12} md={4} lg={3}>

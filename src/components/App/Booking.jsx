@@ -28,8 +28,9 @@ import {
 } from "@material-ui/core";
 import Favorite from "@material-ui/icons/Favorite";
 import FavoriteBorder from "@material-ui/icons/FavoriteBorder";
-
+import MyAppBar from "../signUp/appBar/MyAppBar"
 import CloseIcon from "@material-ui/icons/Close";
+import { Redirect } from "react-router-dom";
 
 function Booking() {
   const [travels, setTravels] = useState([]);
@@ -117,8 +118,13 @@ function Booking() {
     </Button>
   );
 
+  if (!window.localStorage.getItem("uuid")) {
+    return <Redirect to="/" />;
+  }
+
   return (
     <>
+     <MyAppBar />
       <Grid container alignItems="center" className="homeContainer">
         <Grid container>
           <Grid item xs={12} sm={12} md={12} lg={12}>
