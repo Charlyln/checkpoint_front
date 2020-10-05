@@ -1,10 +1,10 @@
-import "date-fns";
-import React, { useState, useEffect } from "react";
-import Axios from "axios";
-import { apiUrl } from "../../apiUrl";
-import List from "@material-ui/core/List";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
+import 'date-fns'
+import React, { useState, useEffect } from 'react'
+import Axios from 'axios'
+import { apiUrl } from '../../apiUrl'
+import List from '@material-ui/core/List'
+import DatePicker from 'react-datepicker'
+import 'react-datepicker/dist/react-datepicker.css'
 import {
   TextField,
   Button,
@@ -23,136 +23,137 @@ import {
   ListItemAvatar,
   ListItemText,
   CircularProgress,
-} from "@material-ui/core";
-import Favorite from "@material-ui/icons/Favorite";
-import FavoriteBorder from "@material-ui/icons/FavoriteBorder";
-import RotateLeftIcon from "@material-ui/icons/RotateLeft";
-import SearchIcon from "@material-ui/icons/Search";
-import CheckIcon from "@material-ui/icons/Check";
+  
+} from '@material-ui/core'
+import Favorite from '@material-ui/icons/Favorite'
+import FavoriteBorder from '@material-ui/icons/FavoriteBorder'
+import RotateLeftIcon from '@material-ui/icons/RotateLeft'
+import SearchIcon from '@material-ui/icons/Search'
+import CheckIcon from '@material-ui/icons/Check'
 
-import "./home.css";
-import MyAppBar from "../signUp/appBar/MyAppBar";
-import { Redirect } from "react-router-dom";
+import './home.css'
+import MyAppBar from '../signUp/appBar/MyAppBar'
+import { Redirect } from 'react-router-dom'
 
 function Home() {
-  const [travels, setTravels] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [city, setCity] = useState("");
-  const [travelsFiltered, setTravelsFiltered] = useState([]);
-  const [userdata, setuserdata] = useState([]);
-  const [UserId, setUserId] = useState("");
-  const [endDate, setEndDate] = useState(new Date());
-  const [travelId, setTravelId] = useState("");
-  const [startDate, setStartDate] = useState(new Date());
-  const [isReset, setIsRest] = useState(false);
-  const [isSearching, setIsSearching] = useState(false);
-  const [fade, setFade] = useState(true);
-  const [citySearch, setCitySearch] = useState("");
+  const [travels, setTravels] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [city, setCity] = useState('')
+  const [travelsFiltered, setTravelsFiltered] = useState([])
+  const [userdata, setuserdata] = useState([])
+  const [UserId, setUserId] = useState('')
+  const [endDate, setEndDate] = useState(new Date())
+  const [travelId, setTravelId] = useState('')
+  const [startDate, setStartDate] = useState(new Date())
+  const [isReset, setIsRest] = useState(false)
+  const [isSearching, setIsSearching] = useState(false)
+  const [fade, setFade] = useState(true)
+  const [citySearch, setCitySearch] = useState('')
 
   useEffect(() => {
-    getTravels();
-    getUser();
-  }, []);
+    getTravels()
+    getUser()
+  }, [])
 
   const getUser = async () => {
-    const id = window.localStorage.getItem("uuid");
+    const id = window.localStorage.getItem('uuid')
     try {
-      const res = await Axios.get(`${apiUrl}/users/${id}`);
-      setuserdata(res.data);
+      const res = await Axios.get(`${apiUrl}/users/${id}`)
+      setuserdata(res.data)
     } catch (err) {
-      console.log(err);
+      console.log(err)
     }
-  };
+  }
 
   const putLike = async (e) => {
-    const id = e.target.id;
-    const likeObject = userdata.Likes.find((like) => like.TravelUuid === id);
+    const id = e.target.id
+    const likeObject = userdata.Likes.find((like) => like.TravelUuid === id)
     if (likeObject) {
-      const likeId = likeObject.id;
-      console.log(likeObject);
+      const likeId = likeObject.id
+      console.log(likeObject)
 
-      await Axios.delete(`${apiUrl}/likes/${likeId}`);
+      await Axios.delete(`${apiUrl}/likes/${likeId}`)
     } else {
       await Axios.post(`${apiUrl}/likes`, {
         TravelUuid: id,
-        UserUuid: UserId,
-      });
+        UserUuid: UserId
+      })
     }
-    getTravels();
-    getUser();
-  };
+    getTravels()
+    getUser()
+  }
 
   const getTravels = async () => {
     try {
-      const res = await Axios.get(`${apiUrl}/travels`);
-      setTravels(res.data);
-      setTravelsFiltered(res.data);
-      setUserId(window.localStorage.getItem("uuid"));
+      const res = await Axios.get(`${apiUrl}/travels`)
+      setTravels(res.data)
+      setTravelsFiltered(res.data)
+      setUserId(window.localStorage.getItem('uuid'))
       const timer = setTimeout(() => {
-        setIsLoading(false);
-      }, 1000);
-      return () => clearTimeout(timer);
+        setIsLoading(false)
+      }, 1000)
+      return () => clearTimeout(timer)
     } catch (err) {
-      console.log(err);
+      console.log(err)
     }
-  };
+  }
   const search = (e) => {
-    e.preventDefault();
+    e.preventDefault()
     if (city) {
-      setIsSearching(true);
-      setIsLoading(true);
-      setFade(false);
+      setIsSearching(true)
+      setIsLoading(true)
+      setFade(false)
 
       const timer = setTimeout(() => {
         const arrayFiltered2 = travels.filter((travel) =>
           travel.localisation.toLowerCase().includes(city.toLowerCase())
-        );
-        setCitySearch(city);
-        setFade(true);
-        setTravelsFiltered(arrayFiltered2);
-        setCity("");
-        setIsSearching(false);
-        setIsLoading(false);
-      }, 1000);
+        )
+        setCitySearch(city)
+        setFade(true)
+        setTravelsFiltered(arrayFiltered2)
+        setCity('')
+        setIsSearching(false)
+        setIsLoading(false)
+      }, 1000)
 
-      return () => clearTimeout(timer);
+      return () => clearTimeout(timer)
     }
-  };
+  }
 
   const reset = () => {
-    setIsRest(true);
-    setFade(false);
+    setIsRest(true)
+    setFade(false)
 
     const timer = setTimeout(() => {
-      setTravelsFiltered(travels);
-      setFade(true);
-      getTravels();
-      setCitySearch("");
-      setCity("");
-      setIsRest(false);
-    }, 1000);
+      setTravelsFiltered(travels)
+      setFade(true)
+      getTravels()
+      setCitySearch('')
+      setCity('')
+      setIsRest(false)
+    }, 1000)
 
-    return () => clearTimeout(timer);
-  };
+    return () => clearTimeout(timer)
+  }
   const sendBooking = async (e) => {
-    e.preventDefault();
+    e.preventDefault()
 
     try {
       if (startDate && endDate) {
-        const UserUuid = window.localStorage.getItem("uuid");
+        const UserUuid = window.localStorage.getItem('uuid')
 
         await Axios.post(`${apiUrl}/bookings`, {
           TravelUuid: travelId,
           UserUuid,
           startDate,
           endDate,
-          accepted: "waiting",
-        });
+          accepted: 'waiting'
+        })
       }
     } catch (err) {
-      console.log(err);
+      console.log(err)
     }
-  };
+  }
 
   const ExampleCustomInput = ({ value, onClick }) => (
     <Button
@@ -164,15 +165,15 @@ function Home() {
     >
       {value}
     </Button>
-  );
+  )
 
-  if (!window.localStorage.getItem("uuid")) {
-    return <Redirect to="/" />;
+  if (!window.localStorage.getItem('uuid')) {
+    return <Redirect to="/" />
   }
 
   return (
     <>
-         <MyAppBar />
+      <MyAppBar />
 
       <Grid container alignItems="center" className="homeContainer">
         <Grid container>
@@ -220,7 +221,7 @@ function Home() {
                         color="primary"
                         variant="outlined"
                         endIcon={<CircularProgress size={20} />}
-                        style={{ marginLeft: "8px" }}
+                        style={{ marginLeft: '8px' }}
                         onClick={reset}
                       >
                         Reset
@@ -231,7 +232,7 @@ function Home() {
                         color="primary"
                         variant="outlined"
                         endIcon={<RotateLeftIcon />}
-                        style={{ marginLeft: "8px" }}
+                        style={{ marginLeft: '8px' }}
                         onClick={reset}
                       >
                         Reset
@@ -246,32 +247,32 @@ function Home() {
             <Grid container alignItems="center" justify="center">
                
               {isLoading ? (
-                ""
+                ''
               ) : (
                 <Fade in={fade} timeout={400}>
                   <List className="list">
                     {travelsFiltered
                       .sort(function (a, b) {
-                        return new Date(b.createdAt) - new Date(a.createdAt);
+                        return new Date(b.createdAt) - new Date(a.createdAt)
                       })
                       .filter((travel) => {
                         if (citySearch) {
                           return travel.localisation
                             .toLowerCase()
-                            .includes(citySearch.toLowerCase());
+                            .includes(citySearch.toLowerCase())
                         } else {
-                          return travel;
+                          return travel
                         }
                       })
                       .map((travel) => {
                         const dates = travel.Bookings.map(
                           (Booking) => new Date(Booking.startDate)
-                        );
+                        )
                         return (
                           <Paper elevation={5}>
                             <Card className="card">
                               <CardMedia
-                                style={{ height: 0, paddingTop: "56.25%" }}
+                                style={{ height: 0, paddingTop: '56.25%' }}
                                 image={travel.imageUrl}
                                 title={travel.pseudo}
                               />
@@ -289,12 +290,12 @@ function Home() {
                               </CardContent>
 
                               {travel.UserUuid === UserId ? (
-                                ""
+                                ''
                               ) : (
                                 <CardContent>
                                   <List>
                                     <ListItem>
-                                      <CardContent style={{ padding: "2px" }}>
+                                      <CardContent style={{ padding: '2px' }}>
                                         <DatePicker
                                           selected={startDate}
                                           onChange={(date) =>
@@ -306,7 +307,7 @@ function Home() {
                                           popperPlacement="top-right"
                                         />
                                       </CardContent>
-                                      <CardContent style={{ padding: "2px" }}>
+                                      <CardContent style={{ padding: '2px' }}>
                                         <DatePicker
                                           selected={endDate}
                                           onChange={(date) => setEndDate(date)}
@@ -316,13 +317,13 @@ function Home() {
                                           popperPlacement="top-right"
                                         />
                                       </CardContent>
-                                      <CardContent style={{ padding: "2px" }}>
+                                      <CardContent style={{ padding: '2px' }}>
                                         <form onSubmit={sendBooking}>
                                           {travelId === travel.uuid ? (
                                             <Button
                                               type="submit"
                                               style={{
-                                                backgroundColor: "#4caf50",
+                                                backgroundColor: '#4caf50'
                                               }}
                                               variant="contained"
                                               endIcon={<CheckIcon />}
@@ -342,8 +343,8 @@ function Home() {
                                                 (booking) =>
                                                   booking.UserUuid === UserId
                                               )
-                                                ? "Re book"
-                                                : "Book"}
+                                                ? 'Re book'
+                                                : 'Book'}
                                             </Button>
                                           )}
                                         </form>
@@ -355,7 +356,7 @@ function Home() {
 
                               <CardActions
                                 disableSpacing
-                                style={{ marginLeft: "5px" }}
+                                style={{ marginLeft: '5px' }}
                               >
                                 <ListItem>
                                   <ListItemAvatar>
@@ -375,10 +376,10 @@ function Home() {
                                 </ListItem>
 
                                 {travel.UserUuid === UserId ? (
-                                  ""
+                                  ''
                                 ) : (
                                   <FormControlLabel
-                                    style={{ marginLeft: "auto" }}
+                                    style={{ marginLeft: 'auto' }}
                                     control={
                                       <Checkbox
                                         icon={<FavoriteBorder />}
@@ -399,7 +400,7 @@ function Home() {
                               </CardActions>
                             </Card>
                           </Paper>
-                        );
+                        )
                       })}
                   </List>
                 </Fade>
@@ -409,7 +410,7 @@ function Home() {
         </Grid>
       </Grid>
     </>
-  );
+  )
 }
 
-export default Home;
+export default Home

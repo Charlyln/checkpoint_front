@@ -1,10 +1,11 @@
-import "date-fns";
-import React, { useState, useEffect } from "react";
-import Axios from "axios";
-import { apiUrl } from "../../apiUrl";
-import List from "@material-ui/core/List";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
+import 'date-fns'
+import React, { useState, useEffect } from 'react'
+import Axios from 'axios'
+import { apiUrl } from '../../apiUrl'
+import List from '@material-ui/core/List'
+import DatePicker from 'react-datepicker'
+import 'react-datepicker/dist/react-datepicker.css'
+import Alert from '@material-ui/lab/Alert'
 
 import {
   Button,
@@ -21,88 +22,87 @@ import {
   Fade,
   ListItem,
   ListItemAvatar,
-  ListItemText,
-} from "@material-ui/core";
-import Favorite from "@material-ui/icons/Favorite";
-import FavoriteBorder from "@material-ui/icons/FavoriteBorder";
-import CheckIcon from "@material-ui/icons/Check";
-import MyAppBar from "../signUp/appBar/MyAppBar";
-import { Redirect } from "react-router-dom";
-
+  ListItemText
+} from '@material-ui/core'
+import Favorite from '@material-ui/icons/Favorite'
+import FavoriteBorder from '@material-ui/icons/FavoriteBorder'
+import CheckIcon from '@material-ui/icons/Check'
+import MyAppBar from '../signUp/appBar/MyAppBar'
+import { Redirect } from 'react-router-dom'
 
 function Favorites() {
-  const [travels, setTravels] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [UserId, setUserId] = useState("");
-  const [userdata, setuserdata] = useState([]);
+  const [travels, setTravels] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [UserId, setUserId] = useState('')
+  const [userdata, setuserdata] = useState([])
 
-  const [endDate, setEndDate] = useState(new Date());
-  const [travelId, setTravelId] = useState("");
-  const [startDate, setStartDate] = useState(new Date());
+  const [endDate, setEndDate] = useState(new Date())
+  const [travelId, setTravelId] = useState('')
+  const [startDate, setStartDate] = useState(new Date())
 
   useEffect(() => {
-    getTravels();
-    getUser();
-  }, []);
+    getTravels()
+    getUser()
+  }, [])
 
   const getUser = async () => {
-    const id = window.localStorage.getItem("uuid");
+    const id = window.localStorage.getItem('uuid')
     try {
-      const res = await Axios.get(`${apiUrl}/users/${id}`);
-      setuserdata(res.data);
+      const res = await Axios.get(`${apiUrl}/users/${id}`)
+      setuserdata(res.data)
     } catch (err) {
-      console.log(err);
+      console.log(err)
     }
-  };
+  }
 
   const putLike = async (e) => {
-    const id = e.target.id;
-    const likeObject = userdata.Likes.find((like) => like.TravelUuid === id);
+    const id = e.target.id
+    const likeObject = userdata.Likes.find((like) => like.TravelUuid === id)
     if (likeObject) {
-      const likeId = likeObject.id;
-      console.log(likeObject);
+      const likeId = likeObject.id
+      console.log(likeObject)
 
-      await Axios.delete(`${apiUrl}/likes/${likeId}`);
+      await Axios.delete(`${apiUrl}/likes/${likeId}`)
     } else {
       await Axios.post(`${apiUrl}/likes`, {
         TravelUuid: id,
-        UserUuid: UserId,
-      });
+        UserUuid: UserId
+      })
     }
-    getTravels();
-    getUser();
-  };
+    getTravels()
+    getUser()
+  }
 
   const getTravels = async () => {
     try {
-      const res = await Axios.get(`${apiUrl}/travels`);
-      setTravels(res.data);
-      setUserId(window.localStorage.getItem("uuid"));
-      setIsLoading(false);
+      const res = await Axios.get(`${apiUrl}/travels`)
+      setTravels(res.data)
+      setUserId(window.localStorage.getItem('uuid'))
+      setIsLoading(false)
     } catch (err) {
-      console.log(err);
+      console.log(err)
     }
-  };
+  }
 
   const sendBooking = async (e) => {
-    e.preventDefault();
+    e.preventDefault()
 
     try {
       if (startDate && endDate) {
-        const UserUuid = window.localStorage.getItem("uuid");
+        const UserUuid = window.localStorage.getItem('uuid')
 
         await Axios.post(`${apiUrl}/bookings`, {
           TravelUuid: travelId,
           UserUuid,
           startDate,
           endDate,
-          accepted: "waiting",
-        });
+          accepted: 'waiting'
+        })
       }
     } catch (err) {
-      console.log(err);
+      console.log(err)
     }
-  };
+  }
 
   const ExampleCustomInput = ({ value, onClick }) => (
     <Button
@@ -114,26 +114,37 @@ function Favorites() {
     >
       {value}
     </Button>
-  );
+  )
 
-  if (!window.localStorage.getItem("uuid")) {
-    return <Redirect to="/" />;
+  if (!window.localStorage.getItem('uuid')) {
+    return <Redirect to="/" />
   }
 
   return (
     <>
-         <MyAppBar />
+      <MyAppBar />
 
       <Grid container alignItems="center" className="homeContainer">
         <Grid container>
           <Grid item xs={12} sm={12} md={12} lg={12}>
-            <Grid container alignItems="center" justify="center" >
+            <Grid container alignItems="center" justify="center">
                
               {isLoading ? (
-                ""
+                ''
               ) : (
                 <Fade in={true}>
                   <List className="list">
+                    {travels.find((message) =>
+                      message.Likes.find(
+                        (element) => element.UserUuid === UserId
+                      )
+                    ) ? (
+                      ''
+                    ) : (
+                      <Alert severity="info" style={{ marginTop: '30px' }}>
+                        You haven't liked any trip.
+                      </Alert>
+                    )}
                     {travels
                       .filter((message) =>
                         message.Likes.find(
@@ -141,19 +152,19 @@ function Favorites() {
                         )
                       )
                       .sort(function (a, b) {
-                        return new Date(b.createdAt) - new Date(a.createdAt);
+                        return new Date(b.createdAt) - new Date(a.createdAt)
                       })
 
                       .map((travel) => (
                         <Paper elevation={5}>
                           <Card
                             style={{
-                              maxWidth: "500px",
-                              margin: "20px 0px",
+                              maxWidth: '500px',
+                              margin: '20px 0px'
                             }}
                           >
                             <CardMedia
-                              style={{ height: 0, paddingTop: "56.25%" }}
+                              style={{ height: 0, paddingTop: '56.25%' }}
                               image={travel.imageUrl}
                               title={travel.pseudo}
                             />
@@ -173,7 +184,7 @@ function Favorites() {
                             <CardContent>
                               <List>
                                 <ListItem>
-                                  <CardContent style={{ padding: "2px" }}>
+                                  <CardContent style={{ padding: '2px' }}>
                                     <DatePicker
                                       selected={startDate}
                                       onChange={(date) => setStartDate(date)}
@@ -182,7 +193,7 @@ function Favorites() {
                                       customInput={<ExampleCustomInput />}
                                     />
                                   </CardContent>
-                                  <CardContent style={{ padding: "2px" }}>
+                                  <CardContent style={{ padding: '2px' }}>
                                     <DatePicker
                                       selected={endDate}
                                       onChange={(date) => setEndDate(date)}
@@ -191,13 +202,13 @@ function Favorites() {
                                       customInput={<ExampleCustomInput />}
                                     />
                                   </CardContent>
-                                  <CardContent style={{ padding: "2px" }}>
+                                  <CardContent style={{ padding: '2px' }}>
                                     <form onSubmit={sendBooking}>
                                       {travelId === travel.uuid ? (
                                         <Button
                                           type="submit"
                                           style={{
-                                            backgroundColor: "#4caf50",
+                                            backgroundColor: '#4caf50'
                                           }}
                                           variant="contained"
                                           endIcon={<CheckIcon />}
@@ -217,8 +228,8 @@ function Favorites() {
                                             (booking) =>
                                               booking.UserUuid === UserId
                                           )
-                                            ? "Re book"
-                                            : "Book"}
+                                            ? 'Re book'
+                                            : 'Book'}
                                         </Button>
                                       )}
                                     </form>
@@ -229,7 +240,7 @@ function Favorites() {
 
                             <CardActions
                               disableSpacing
-                              style={{ marginLeft: "5px" }}
+                              style={{ marginLeft: '5px' }}
                             >
                               <ListItem>
                                 <ListItemAvatar>
@@ -243,7 +254,7 @@ function Favorites() {
                                 />
                               </ListItem>
                               <FormControlLabel
-                                style={{ marginLeft: "auto" }}
+                                style={{ marginLeft: 'auto' }}
                                 control={
                                   <Checkbox
                                     icon={<FavoriteBorder />}
@@ -272,7 +283,7 @@ function Favorites() {
         </Grid>
       </Grid>
     </>
-  );
+  )
 }
 
-export default Favorites;
+export default Favorites

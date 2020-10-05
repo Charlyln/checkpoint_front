@@ -1,13 +1,16 @@
-import "date-fns";
-import React, { useState, useEffect } from "react";
-import Axios from "axios";
-import { apiUrl } from "../../apiUrl";
-import List from "@material-ui/core/List";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-import HourglassEmptyIcon from "@material-ui/icons/HourglassEmpty";
-import CheckIcon from "@material-ui/icons/Check";
-import BlockIcon from "@material-ui/icons/Block";
+import 'date-fns'
+import React, { useState, useEffect } from 'react'
+import Axios from 'axios'
+import { apiUrl } from '../../apiUrl'
+import List from '@material-ui/core/List'
+import DatePicker from 'react-datepicker'
+import 'react-datepicker/dist/react-datepicker.css'
+import HourglassEmptyIcon from '@material-ui/icons/HourglassEmpty'
+import CheckIcon from '@material-ui/icons/Check'
+import BlockIcon from '@material-ui/icons/Block'
+import Alert from '@material-ui/lab/Alert'
+import DeleteIcon from '@material-ui/icons/Delete'
+
 import {
   Button,
   Avatar,
@@ -25,86 +28,102 @@ import {
   ListItemAvatar,
   ListItemText,
   Divider,
-} from "@material-ui/core";
-import Favorite from "@material-ui/icons/Favorite";
-import FavoriteBorder from "@material-ui/icons/FavoriteBorder";
-import MyAppBar from "../signUp/appBar/MyAppBar"
-import CloseIcon from "@material-ui/icons/Close";
-import { Redirect } from "react-router-dom";
+  IconButton, Snackbar
+} from '@material-ui/core'
+import Favorite from '@material-ui/icons/Favorite'
+import FavoriteBorder from '@material-ui/icons/FavoriteBorder'
+import MyAppBar from '../signUp/appBar/MyAppBar'
+import CloseIcon from '@material-ui/icons/Close'
+import { Redirect } from 'react-router-dom'
 
 function Booking() {
-  const [travels, setTravels] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [travelsFiltered, setTravelsFiltered] = useState([]);
-  const [userdata, setuserdata] = useState([]);
-  const [UserId, setUserId] = useState("");
+  const [travels, setTravels] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [travelsFiltered, setTravelsFiltered] = useState([])
+  const [userdata, setuserdata] = useState([])
+  const [UserId, setUserId] = useState('')
+  const [bookingIdForCancel, setBookingIDForCancel] = useState('')
+  const [open, setOpen] = useState(false)
 
-  const [bookingIdForCancel, setBookingIDForCancel] = useState("");
+  const handleClose = () => {
+    setOpen(false)
+  }
+  const handleOpen = () => {
+    setOpen(true)
+  }
 
   useEffect(() => {
-    getTravels();
-    getUser();
-  }, []);
+    getTravels()
+     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const getUser = async () => {
-    const id = window.localStorage.getItem("uuid");
+    const id = window.localStorage.getItem('uuid')
     try {
-      const res = await Axios.get(`${apiUrl}/users/${id}`);
-      setuserdata(res.data);
+      const res = await Axios.get(`${apiUrl}/users/${id}`)
+      setuserdata(res.data)
     } catch (err) {
-      console.log(err);
+      console.log(err)
     }
-  };
+  }
 
   useEffect(() => {
     const interval = setInterval(() => {
-      getTravels();
-    }, 2000);
-    return () => clearInterval(interval);
-  }, []);
+      getTravels()
+    }, 2000)
+    return () => clearInterval(interval)
+     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const putLike = async (e) => {
-    const id = e.target.id;
-    const likeObject = userdata.Likes.find((like) => like.TravelUuid === id);
+    const id = e.target.id
+    const likeObject = userdata.Likes.find((like) => like.TravelUuid === id)
     if (likeObject) {
-      const likeId = likeObject.id;
-      console.log(likeObject);
+      const likeId = likeObject.id
+      console.log(likeObject)
 
-      await Axios.delete(`${apiUrl}/likes/${likeId}`);
+      await Axios.delete(`${apiUrl}/likes/${likeId}`)
     } else {
       await Axios.post(`${apiUrl}/likes`, {
         TravelUuid: id,
-        UserUuid: UserId,
-      });
+        UserUuid: UserId
+      })
     }
-    getTravels();
-    getUser();
-  };
+    getTravels()
+    getUser()
+  }
 
   const changeBooking = async (e) => {
-    e.preventDefault();
+    e.preventDefault()
 
     try {
       await Axios.put(`${apiUrl}/bookings/${bookingIdForCancel}`, {
-        accepted: "canceled",
-      });
+        accepted: 'canceled'
+      })
     } catch (err) {
-      console.log(err);
+      console.log(err)
     }
-    getTravels();
-  };
+    getTravels()
+  }
 
   const getTravels = async () => {
     try {
-      const res = await Axios.get(`${apiUrl}/travels`);
-      setTravels(res.data);
-      setTravelsFiltered(res.data);
-      setUserId(window.localStorage.getItem("uuid"));
-      setIsLoading(false);
+      const res = await Axios.get(`${apiUrl}/travels`)
+      setTravels(res.data)
+      setTravelsFiltered(res.data)
+      setUserId(window.localStorage.getItem('uuid'))
+      await getUser()
+      setIsLoading(false)
     } catch (err) {
-      console.log(err);
+      console.log(err)
     }
-  };
+  }
+
+  const deleteBooking = async (uuid) => {
+    await Axios.delete(`${apiUrl}/bookings/${uuid}`)
+    getTravels()
+    handleOpen()
+  }
 
   const ExampleCustomInput = ({ value, onClick }) => (
     <Button
@@ -116,28 +135,49 @@ function Booking() {
     >
       {value}
     </Button>
-  );
+  )
 
-  if (!window.localStorage.getItem("uuid")) {
-    return <Redirect to="/" />;
+  if (!window.localStorage.getItem('uuid')) {
+    return <Redirect to="/" />
   }
 
   return (
     <>
-     <MyAppBar />
+      <MyAppBar />
       <Grid container alignItems="center" className="homeContainer">
         <Grid container>
           <Grid item xs={12} sm={12} md={12} lg={12}>
             <Grid container alignItems="center" justify="center">
-               {travels ? "" : ""}
+              <Snackbar
+                open={open}
+                autoHideDuration={3000}
+                onClose={handleClose}
+                anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+              >
+                <Alert
+                  onClose={handleClose}
+                  severity="success"
+                  variant="filled"
+                >
+                  Booking deleted !
+                </Alert>
+              </Snackbar>
+               {travels ? '' : ''}
               {isLoading ? (
-                ""
+                ''
               ) : (
                 <Fade in={true}>
                   <List className="list">
+                    {userdata.Bookings.length === 0 ? (
+                      <Alert severity="info" style={{ marginTop: '30px' }}>
+                        You haven't booked any trip yet.
+                      </Alert>
+                    ) : (
+                      ''
+                    )}
                     {travelsFiltered
                       .sort(function (a, b) {
-                        return new Date(b.createdAt) - new Date(a.createdAt);
+                        return new Date(b.createdAt) - new Date(a.createdAt)
                       })
                       .filter((travel) =>
                         travel.Bookings.find(
@@ -153,12 +193,12 @@ function Booking() {
                           <Paper elevation={5}>
                             <Card
                               style={{
-                                maxWidth: "500px",
-                                margin: "20px 0px",
+                                maxWidth: '500px',
+                                margin: '20px 0px'
                               }}
                             >
                               <CardMedia
-                                style={{ height: 0, paddingTop: "56.25%" }}
+                                style={{ height: 0, paddingTop: '56.25%' }}
                                 image={travel.imageUrl}
                                 title={travel.pseudo}
                               />
@@ -187,16 +227,17 @@ function Booking() {
                                   return (
                                     new Date(b.createdAt) -
                                     new Date(a.createdAt)
-                                  );
+                                  )
                                 })
                                 .map((booking) => (
                                   <>
                                     <CardContent>
                                       <List>
                                         <ListItem
-                                          style={{ width: " max-content" }}
+                                          style={{ width: ' max-content' }}
                                         >
                                           <DatePicker
+                                            disabled
                                             selected={
                                               new Date(booking.startDate)
                                             }
@@ -207,6 +248,7 @@ function Booking() {
                                             customInput={<ExampleCustomInput />}
                                           />
                                           <DatePicker
+                                            disabled
                                             selected={new Date(booking.endDate)}
                                             // onChange={(date) => setEndDate(date)}
                                             // excludeDates={[new Date()]}
@@ -214,7 +256,7 @@ function Booking() {
                                             customInput={<ExampleCustomInput />}
                                           />
                                           <ListItemAvatar
-                                            style={{ marginLeft: "5px" }}
+                                            style={{ marginLeft: '5px' }}
                                           >
                                             <Avatar
                                               src={booking.User.avatar}
@@ -228,11 +270,11 @@ function Booking() {
                                         <ListItem>
                                           <form onSubmit={changeBooking}>
                                             {booking.accepted ===
-                                            "confirmed" ? (
+                                            'confirmed' ? (
                                               <>
                                                 <Button
                                                   style={{
-                                                    backgroundColor: "#4caf50",
+                                                    backgroundColor: '#4caf50'
                                                   }}
                                                   variant="contained"
                                                   endIcon={<CheckIcon />}
@@ -243,7 +285,7 @@ function Booking() {
                                                 <Button
                                                   type="submit"
                                                   style={{
-                                                    backgroundColor: "#e91e63",
+                                                    backgroundColor: '#e91e63'
                                                   }}
                                                   variant="contained"
                                                   onClick={(e) =>
@@ -256,22 +298,41 @@ function Booking() {
                                                 </Button>
                                               </>
                                             ) : booking.accepted ===
-                                              "waiting" ? (
-                                              <Button
-                                                style={{
-                                                  backgroundColor: "#ffc400",
-                                                }}
-                                                variant="contained"
-                                                endIcon={<HourglassEmptyIcon />}
-                                                className="buttonItem"
-                                              >
-                                                Waiting
-                                              </Button>
+                                              'waiting' ? (
+                                              <>
+                                                <Button
+                                                  style={{
+                                                    backgroundColor: '#ffc400'
+                                                  }}
+                                                  variant="contained"
+                                                  endIcon={
+                                                    <HourglassEmptyIcon />
+                                                  }
+                                                  className="buttonItem"
+                                                >
+                                                  Waiting
+                                                </Button>
+                                                <Button
+                                                  type="submit"
+                                                  style={{
+                                                    backgroundColor: '#e91e63'
+                                                  }}
+                                                  variant="contained"
+                                                  onClick={(e) =>
+                                                    setBookingIDForCancel(
+                                                      booking.uuid
+                                                    )
+                                                  }
+                                                  endIcon={<CloseIcon />}
+                                                >
+                                                  Cancel
+                                                </Button>
+                                              </>
                                             ) : booking.accepted ===
-                                              "refused" ? (
+                                              'refused' ? (
                                               <Button
                                                 style={{
-                                                  backgroundColor: "#ef6c00",
+                                                  backgroundColor: '#ef6c00'
                                                 }}
                                                 variant="contained"
                                                 endIcon={<BlockIcon />}
@@ -280,16 +341,27 @@ function Booking() {
                                                 Refused
                                               </Button>
                                             ) : (
-                                              <Button
-                                                style={{
-                                                  backgroundColor: "#757575",
-                                                }}
-                                                variant="contained"
-                                                endIcon={<CloseIcon />}
-                                                className="buttonItem"
-                                              >
-                                                Canceled
-                                              </Button>
+                                              <>
+                                                <Button
+                                                  style={{
+                                                    backgroundColor: '#757575'
+                                                  }}
+                                                  variant="contained"
+                                                  endIcon={<CloseIcon />}
+                                                  className="buttonItem"
+                                                >
+                                                  Canceled
+                                                </Button>
+
+                                                <IconButton
+                                                  onClick={() =>
+                                                    deleteBooking(booking.uuid)
+                                                  }
+                                                  color="secondary"
+                                                >
+                                                  <DeleteIcon />
+                                                </IconButton>
+                                              </>
                                             )}
                                           </form>
                                         </ListItem>
@@ -313,7 +385,7 @@ function Booking() {
                                   />
                                 </ListItem>
                                 <FormControlLabel
-                                  style={{ marginLeft: "auto" }}
+                                  style={{ marginLeft: 'auto' }}
                                   control={
                                     <Checkbox
                                       icon={<FavoriteBorder />}
@@ -333,7 +405,7 @@ function Booking() {
                               </CardActions>
                             </Card>
                           </Paper>
-                        );
+                        )
                       })}
                   </List>
                 </Fade>
@@ -343,7 +415,7 @@ function Booking() {
         </Grid>
       </Grid>
     </>
-  );
+  )
 }
 
-export default Booking;
+export default Booking

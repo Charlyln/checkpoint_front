@@ -7,7 +7,8 @@ import {
   Button,
   CircularProgress,
   AppBar,
-  Toolbar
+  Toolbar,
+  Typography
 } from '@material-ui/core'
 import PersonIcon from '@material-ui/icons/Person'
 import { Redirect } from 'react-router-dom'
@@ -65,28 +66,11 @@ function SignUp() {
         <Toolbar style={{ width: '100%', padding: 0 }}></Toolbar>
       </AppBar>
       <Grid container>
-        <Grid item xs={12} style={{ marginTop: '130px' }}>
-          <Grid container justify="center">
-            {/* <input
-              accept="image/*"
-              style={{ display: "none" }}
-              id="contained-button-file"
-              type="file"
-              // files={logo}
-              // onChange={handleLogo}
-              multiple
-            />
-            <label htmlFor="contained-button-file">
-              <Button
-                // startIcon={<CloudUploadIcon />}
-                variant="outlined"
-                color="primary"
-                component="span"
-              >
-                Upload
-              </Button>
-            </label> */}
-
+        <Grid item xs={12} style={{ marginTop: '100px', textAlign: 'center' }}>
+          <Typography variant="button" gutterBottom>
+            1. Select your avatar
+          </Typography>
+          <Grid container justify="center" style={{ marginTop: '20px' }}>
             <Button
               color="primary"
               variant="outlined"
@@ -105,14 +89,16 @@ function SignUp() {
               style={{ width: '70px', height: '70px' }}
             />
           </Grid>
-          <Grid item xs={12} style={{ marginTop: '50px' }}>
+          <Grid item xs={12} style={{ marginTop: '50px', textAlign: 'center' }}>
+            <Typography variant="button" gutterBottom>
+              2. Provide your pseudo
+            </Typography>
             <Grid container alignItems="center" justify="center">
               <TextField
                 style={{ margin: '20px' }}
                 id="message"
                 label="Pseudo"
                 variant="outlined"
-                autoFocus="autofocus"
                 onChange={(e) => setPseudo(e.target.value)}
               />
             </Grid>
@@ -162,7 +148,7 @@ function SignUp() {
                     onClick={SignupPost}
                     variant="contained"
                     color="primary"
-                    disabled={postLoading}
+                    disabled={!pseudo || !logo}
                   >
                     Signup
                   </Button>

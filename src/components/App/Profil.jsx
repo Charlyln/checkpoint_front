@@ -14,13 +14,24 @@ import {
   Divider,
   ListItemAvatar,
   ListItemText,
-  Fade
+  Fade,
+  Dialog,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  IconButton,
+  Snackbar,
+  CardActions
 } from '@material-ui/core'
+import DeleteIcon from '@material-ui/icons/Delete'
+
+import Alert from '@material-ui/lab/Alert'
 import DatePicker from 'react-datepicker'
 import SendIcon from '@material-ui/icons/Send'
 import CheckIcon from '@material-ui/icons/Check'
 import CloseIcon from '@material-ui/icons/Close'
 import BlockIcon from '@material-ui/icons/Block'
+import ClearIcon from '@material-ui/icons/Clear'
 
 import { apiUrl } from '../../apiUrl'
 import './profil.css'
@@ -34,21 +45,27 @@ function Profil() {
   const [bookingId, setBookingID] = useState('')
   const [bookingIdForCancel, setBookingIDForCancel] = useState('')
   const [bookingIdForRefuse, setBookingIDForRefuse] = useState('')
+  const [open, setOpen] = useState(false)
+  const [openDeletePost, setOpenDeletePost] = useState(false)
 
-  useEffect(() => {
-    getUserData()
+  const handleClose = () => {
+    setOpen(false)
+  }
+  const handleOpen = () => {
+    setOpen(true)
+  }
+
+  const handleCloseDeletePost = () => {
+    setOpenDeletePost(false)
+  }
+  const handleOpenDeletePost = () => {
+    setOpenDeletePost(true)
+  }
+
+  const deletePost = async (uuid) => {
+    await Axios.delete(`${apiUrl}/travels/${uuid}`)
     getMyTravels()
-    setIsLoading(false)
-  }, [])
-
-  const getMyTravels = async () => {
-    try {
-      const UserUuid = window.localStorage.getItem('uuid')
-      const res = await Axios.get(`${apiUrl}/travels/${UserUuid}`)
-      setMyTravels(res.data)
-    } catch (err) {
-      console.log(err)
-    }
+    handleOpenDeletePost()
   }
 
   const ExampleCustomInput = ({ value, onClick }) => (
@@ -63,11 +80,27 @@ function Profil() {
     </Button>
   )
 
+  useEffect(() => {
+    getUserData()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  const getMyTravels = async () => {
+    try {
+      const UserUuid = window.localStorage.getItem('uuid')
+      const res = await Axios.get(`${apiUrl}/travels/${UserUuid}`)
+      setMyTravels(res.data)
+      setIsLoading(false)
+    } catch (err) {
+      console.log(err)
+    }
+  }
   const getUserData = async () => {
     try {
       const id = window.localStorage.getItem('uuid')
       const res = await Axios.get(`${apiUrl}/users/${id}`)
       setUserData(res.data)
+      getMyTravels()
     } catch (err) {
       console.log(err)
     }
@@ -107,6 +140,13 @@ function Profil() {
     setBookingIDForRefuse('')
   }
 
+  const deleteUser = async () => {
+    const uuid = window.localStorage.getItem('uuid')
+    await Axios.delete(`${apiUrl}/users/${uuid}`)
+    window.localStorage.removeItem('uuid')
+    setUserData('')
+  }
+
   if (!window.localStorage.getItem('uuid')) {
     return <Redirect to="/" />
   }
@@ -121,7 +161,12 @@ function Profil() {
           <Grid container alignItems="center" className="homeContainer">
             <Grid container>
               <Grid item xs={12} sm={12} md={4} lg={3}>
-                <Grid container alignItems="center" justify="center">
+                <Grid
+                  container
+                  alignItems="center"
+                  justify="center"
+                  style={{ marginTop: '15px' }}
+                >
                   <ListItem>
                     <Fade in={true}>
                       <ListItemAvatar>
@@ -133,12 +178,82 @@ function Profil() {
                     </Fade>
                     <ListItemText primary={userData.pseudo} />
                   </ListItem>
+                  <ListItem>
+                    <Button
+                      size="small"
+                      variant="contained"
+                      color="secondary"
+                      endIcon={<ClearIcon />}
+                      onClick={handleOpen}
+                    >
+                      Delete my profil
+                    </Button>
+                  </ListItem>
                 </Grid>
               </Grid>
+
+              <Snackbar
+                open={openDeletePost}
+                autoHideDuration={3000}
+                onClose={handleCloseDeletePost}
+                anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+              >
+                <Alert
+                  onClose={handleCloseDeletePost}
+                  severity="success"
+                  variant="filled"
+                >
+                  Travel deleted !
+                </Alert>
+              </Snackbar>
+
+              <Dialog
+                open={open}
+                keepMounted
+                onClose={handleClose}
+                aria-labelledby="alert-dialog-slide-title"
+                aria-describedby="alert-dialog-slide-description"
+                maxWidth="sm"
+                fullWidth
+              >
+                <DialogTitle
+                  id="alert-dialog-slide-title"
+                  style={{ alignSelf: 'center' }}
+                >
+                  {'Do you want delete your profil ?'}
+                </DialogTitle>
+                <DialogContent style={{ alignSelf: 'center' }}>
+                  <DialogContentText id="alert-dialog-description">
+                    ( All your travels and your bookings will be deleted too )
+                  </DialogContentText>
+                </DialogContent>
+
+                <DialogContent style={{ alignSelf: 'center' }}>
+                  <Button color="primary" onClick={handleClose}>
+                    Back
+                  </Button>
+                  <Button
+                    style={{ marginLeft: '30px' }}
+                    variant="contained"
+                    color="secondary"
+                    endIcon={<ClearIcon />}
+                    onClick={deleteUser}
+                  >
+                    I confirme
+                  </Button>
+                </DialogContent>
+              </Dialog>
 
               <Grid item xs={12} sm={12} md={8} lg={9}>
                 <Grid container alignItems="center" justify="center">
                   <List className="list">
+                    {myTravels && myTravels.length === 0 ? (
+                      <Alert severity="info" style={{ marginTop: '30px' }}>
+                        You haven't posted any trip yet.
+                      </Alert>
+                    ) : (
+                      ''
+                    )}
                     {myTravels
                       .sort(function (a, b) {
                         return new Date(b.createdAt) - new Date(a.createdAt)
@@ -161,18 +276,39 @@ function Profil() {
                                 {travel.title}
                               </Typography>
                             </CardContent>
+
+                            <CardContent>
+                              <Typography>{travel.localisation}</Typography>
+                            </CardContent>
+                            <CardContent>
+                              <Typography>{travel.description}</Typography>
+                            </CardContent>
+
+                            <CardActions>
+                              <IconButton
+                                color="secondary"
+                                style={{ marginLeft: 'auto' }}
+                                onClick={() => deletePost(travel.uuid)}
+                              >
+                                <DeleteIcon />
+                              </IconButton>
+                            </CardActions>
                             <Divider />
                             <CardContent>
                               {travel.Bookings.length === 0 ? (
-                                <Button color="primary" variant="outlined">
-                                  You don't have bookings yet
-                                </Button>
+                                <Alert
+                                  severity="info"
+                                  style={{ marginTop: '30px' }}
+                                >
+                                  You don't have any bookings on this trip yet.
+                                </Alert>
                               ) : (
                                 <Typography variant="h5" gutterBottom>
                                   Bookings
                                 </Typography>
                               )}
                             </CardContent>
+
                             <Divider />
                             {travel.Bookings.sort(function (a, b) {
                               return (
@@ -184,6 +320,7 @@ function Profil() {
                                   <List>
                                     <ListItem style={{ width: ' max-content' }}>
                                       <DatePicker
+                                        disabled
                                         selected={new Date(booking.startDate)}
                                         // onChange={(date) => setStartDate(date)}
                                         // excludeDates={dates}
@@ -193,6 +330,7 @@ function Profil() {
                                       />
 
                                       <DatePicker
+                                        disabled
                                         selected={new Date(booking.endDate)}
                                         // onChange={(date) => setEndDate(date)}
                                         // excludeDates={[new Date()]}

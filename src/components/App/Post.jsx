@@ -231,7 +231,7 @@ const Post = () => {
                     onClick={sendPost}
                     variant="contained"
                     color="primary"
-                    disabled={postLoading}
+                    disabled={!title || !photo || !localisation || !description}
                   >
                     Post
                   </Button>
